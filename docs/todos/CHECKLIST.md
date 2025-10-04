@@ -63,14 +63,14 @@
 - [x] Configure session persistence
 
 ### Basic Appointment Management
-- [ ] Create Appointment Server Actions (/app/actions/appointments.ts)
-  - [ ] createAppointment action
-  - [ ] updateAppointment action
-  - [ ] cancelAppointment action
-  - [ ] getAppointments action (with date filtering)
-- [ ] Implement conflict detection logic (same staff, overlapping times)
-- [ ] Create appointment validation rules
-- [ ] Add error handling and rollback for failed operations
+- [x] Create Appointment Server Actions (/app/actions/appointments.ts)
+  - [x] createAppointment action
+  - [x] updateAppointment action
+  - [x] cancelAppointment action
+  - [x] getAppointments action (with date filtering)
+- [x] Implement conflict detection logic (same staff, overlapping times)
+- [x] Create appointment validation rules
+- [x] Add error handling and rollback for failed operations
 
 ### Staff Dashboard Layout
 - [x] Create dashboard layout component (/app/dashboard/layout.tsx)
@@ -82,30 +82,30 @@
 - [x] Test accessibility (WCAG 2.1 AA)
 
 ### Dashboard - Appointments View
-- [ ] Create /app/dashboard/appointments page
-- [ ] Implement daily calendar view component
-- [ ] Implement weekly calendar view component
-- [ ] Add view toggle (day/week)
-- [ ] Create appointment card component
-- [ ] Add "Create Appointment" button (< 3 clicks requirement)
-- [ ] Create appointment creation modal/form
-- [ ] Implement appointment edit modal
-- [ ] Add appointment cancellation with confirmation
-- [ ] Show conflict warnings in real-time
-- [ ] Display service name, duration, and price
-- [ ] Test calendar navigation (previous/next day/week)
+- [x] Create /app/dashboard/appointments page
+- [x] Implement daily calendar view component
+- [x] Implement weekly calendar view component
+- [x] Add view toggle (day/week)
+- [x] Create appointment card component
+- [x] Add "Create Appointment" button (< 3 clicks requirement)
+- [x] Create appointment creation modal/form
+- [x] Implement appointment edit modal
+- [x] Add appointment cancellation with confirmation
+- [x] Show conflict warnings in real-time
+- [x] Display service name, duration, and price
+- [x] Test calendar navigation (previous/next day/week)
 
 ---
 
 ## Phase 2: Payment System (Weeks 3-4)
 
 ### Stripe Integration Setup
-- [ ] Create Stripe account (test mode)
-- [ ] Install stripe and @stripe/stripe-js packages
-- [ ] Set up Stripe API keys in environment variables
-- [ ] Create lib/stripe.ts with Stripe client initialization
+- [x] Create Stripe account (test mode)
+- [x] Install stripe and @stripe/stripe-js packages
+- [x] Set up Stripe API keys in environment variables
+- [x] Create lib/stripe.ts with Stripe client initialization
 - [ ] Configure webhook endpoint secret
-- [ ] Test Stripe connection in development
+- [x] Test Stripe connection in development
 
 ### Payment Schema
 - [ ] Create PaymentMethod enum (CREDIT_CARD, GIFT_CERTIFICATE, CASH, OTHER)

@@ -50,17 +50,17 @@
 - [x] Test schema with basic queries
 
 ### Authentication (NextAuth.js)
-- [ ] Install next-auth and dependencies
-- [ ] Create /app/api/auth/[...nextauth]/route.ts
-- [ ] Configure email/password authentication provider
-- [ ] Set up JWT session strategy
-- [ ] Create login page (/app/login)
-- [ ] Create signup page (/app/signup)
-- [ ] Implement role-based authorization middleware
-- [ ] Create protected route wrapper for dashboard
-- [ ] Test authentication flow (signup, login, logout)
-- [ ] Add password hashing with bcrypt
-- [ ] Configure session persistence
+- [x] Install next-auth and dependencies
+- [x] Create /app/api/auth/[...nextauth]/route.ts
+- [x] Configure email/password authentication provider
+- [x] Set up JWT session strategy
+- [x] Create login page (/app/login)
+- [x] Create signup page (/app/signup)
+- [x] Implement role-based authorization middleware
+- [x] Create protected route wrapper for dashboard
+- [x] Test authentication flow (signup, login, logout)
+- [x] Add password hashing with bcrypt
+- [x] Configure session persistence
 
 ### Basic Appointment Management
 - [ ] Create Appointment Server Actions (/app/actions/appointments.ts)

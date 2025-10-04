@@ -73,13 +73,13 @@
 - [ ] Add error handling and rollback for failed operations
 
 ### Staff Dashboard Layout
-- [ ] Create dashboard layout component (/app/dashboard/layout.tsx)
-- [ ] Implement navigation menu (Appointments, Clients, Services, Payments)
-- [ ] Create responsive sidebar for desktop
-- [ ] Add user profile dropdown with logout
-- [ ] Create mobile navigation menu
-- [ ] Add breadcrumb navigation
-- [ ] Test accessibility (WCAG 2.1 AA)
+- [x] Create dashboard layout component (/app/dashboard/layout.tsx)
+- [x] Implement navigation menu (Appointments, Clients, Services, Payments)
+- [x] Create responsive sidebar for desktop
+- [x] Add user profile dropdown with logout
+- [x] Create mobile navigation menu
+- [x] Add breadcrumb navigation
+- [x] Test accessibility (WCAG 2.1 AA)
 
 ### Dashboard - Appointments View
 - [ ] Create /app/dashboard/appointments page

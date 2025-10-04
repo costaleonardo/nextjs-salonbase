@@ -1,0 +1,686 @@
+# SalonBase MVP Development Checklist
+
+**Target Timeline:** 8 weeks (January 2026 Launch)
+**Last Updated:** October 2, 2025
+
+---
+
+## Phase 1: Core Foundation (Weeks 1-2)
+
+### Project Setup & Infrastructure
+- [x] Initialize Next.js 15 project with App Router
+- [x] Configure TypeScript with strict mode
+- [x] Set up ESLint and Prettier
+- [x] Configure Git workflow (main branch, feature branches)
+- [x] Set up environment variables structure (.env.local, .env.example)
+- [x] Create project folder structure (/app, /lib, /components, /prisma)
+- [x] Set up Vercel deployment pipeline
+
+### Database Setup (Neon PostgreSQL)
+- [ ] Create Neon account and project
+- [ ] Provision production database (Pro plan - $19/month)
+- [ ] Provision development database (Free tier or branch)
+- [ ] Set up environment variables (DATABASE_URL_POOLED, DATABASE_URL_DIRECT)
+- [ ] Configure SSL/TLS connections
+- [ ] Set up IP allowlisting for production
+- [ ] Test connection pooling configuration
+- [ ] Configure point-in-time recovery (7 days)
+- [ ] Set up database branching workflow
+
+### Prisma ORM Setup
+- [ ] Install Prisma dependencies (@prisma/client, @neondatabase/serverless, @prisma/adapter-neon)
+- [ ] Create prisma/schema.prisma with datasource configuration
+- [ ] Implement lib/db.ts with Neon adapter and connection pooling
+- [ ] Configure Prisma logging (development vs production)
+- [ ] Set up migration scripts in package.json
+
+### Database Schema - Core Models
+- [ ] Create User model (id, email, role, salonId, timestamps)
+- [ ] Add User indexes (salonId, email)
+- [ ] Create Role enum (OWNER, STAFF, CLIENT)
+- [ ] Create Salon model (id, name, settings, timestamps)
+- [ ] Create Client model (id, salonId, name, email, phone, notes)
+- [ ] Add Client indexes (salonId, email, phone)
+- [ ] Create Service model (id, salonId, name, duration, price, staffIds)
+- [ ] Add Service indexes (salonId)
+- [ ] Create AppointmentStatus enum (SCHEDULED, COMPLETED, CANCELLED, NO_SHOW)
+- [ ] Create Appointment model (id, clientId, staffId, serviceId, datetime, status)
+- [ ] Add Appointment indexes (datetime, staffId+datetime, clientId)
+- [ ] Run initial migration: `prisma migrate dev --name init`
+- [ ] Test schema with basic queries
+
+### Authentication (NextAuth.js)
+- [ ] Install next-auth and dependencies
+- [ ] Create /app/api/auth/[...nextauth]/route.ts
+- [ ] Configure email/password authentication provider
+- [ ] Set up JWT session strategy
+- [ ] Create login page (/app/login)
+- [ ] Create signup page (/app/signup)
+- [ ] Implement role-based authorization middleware
+- [ ] Create protected route wrapper for dashboard
+- [ ] Test authentication flow (signup, login, logout)
+- [ ] Add password hashing with bcrypt
+- [ ] Configure session persistence
+
+### Basic Appointment Management
+- [ ] Create Appointment Server Actions (/app/actions/appointments.ts)
+  - [ ] createAppointment action
+  - [ ] updateAppointment action
+  - [ ] cancelAppointment action
+  - [ ] getAppointments action (with date filtering)
+- [ ] Implement conflict detection logic (same staff, overlapping times)
+- [ ] Create appointment validation rules
+- [ ] Add error handling and rollback for failed operations
+
+### Staff Dashboard Layout
+- [ ] Create dashboard layout component (/app/dashboard/layout.tsx)
+- [ ] Implement navigation menu (Appointments, Clients, Services, Payments)
+- [ ] Create responsive sidebar for desktop
+- [ ] Add user profile dropdown with logout
+- [ ] Create mobile navigation menu
+- [ ] Add breadcrumb navigation
+- [ ] Test accessibility (WCAG 2.1 AA)
+
+### Dashboard - Appointments View
+- [ ] Create /app/dashboard/appointments page
+- [ ] Implement daily calendar view component
+- [ ] Implement weekly calendar view component
+- [ ] Add view toggle (day/week)
+- [ ] Create appointment card component
+- [ ] Add "Create Appointment" button (< 3 clicks requirement)
+- [ ] Create appointment creation modal/form
+- [ ] Implement appointment edit modal
+- [ ] Add appointment cancellation with confirmation
+- [ ] Show conflict warnings in real-time
+- [ ] Display service name, duration, and price
+- [ ] Test calendar navigation (previous/next day/week)
+
+---
+
+## Phase 2: Payment System (Weeks 3-4)
+
+### Stripe Integration Setup
+- [ ] Create Stripe account (test mode)
+- [ ] Install stripe and @stripe/stripe-js packages
+- [ ] Set up Stripe API keys in environment variables
+- [ ] Create lib/stripe.ts with Stripe client initialization
+- [ ] Configure webhook endpoint secret
+- [ ] Test Stripe connection in development
+
+### Payment Schema
+- [ ] Create PaymentMethod enum (CREDIT_CARD, GIFT_CERTIFICATE, CASH, OTHER)
+- [ ] Create PaymentStatus enum (PENDING, COMPLETED, FAILED, REFUNDED)
+- [ ] Create Payment model (id, appointmentId, amount, method, stripePaymentId, status, createdAt)
+- [ ] Add Payment to Appointment relation (one-to-one)
+- [ ] Add Payment indexes (stripePaymentId)
+- [ ] Create PaymentAuditLog model (id, paymentId, action, details JSON, createdAt)
+- [ ] Add PaymentAuditLog indexes (paymentId, createdAt)
+- [ ] Run migration: `prisma migrate dev --name add_payments`
+
+### Gift Certificate System
+- [ ] Create GiftCertificate model (id, code, balance, originalAmount, salonId, clientId, createdAt, expiresAt)
+- [ ] Add GiftCertificate indexes (code, salonId)
+- [ ] Run migration: `prisma migrate dev --name add_gift_certificates`
+- [ ] Create gift certificate generation logic (unique code generator)
+- [ ] Implement gift certificate validation
+- [ ] Create checkGiftCertificateBalance server action
+- [ ] Create redeemGiftCertificate server action
+- [ ] Add gift certificate balance tracking
+- [ ] Implement expiration date handling
+- [ ] Test certificate deduplication
+
+### Payment Processing - CRITICAL IMPLEMENTATION
+- [ ] Create payment source selection component with EXPLICIT UI
+  - [ ] Radio buttons for payment source (Gift Certificate, Credit Card, Cash, Other)
+  - [ ] Show gift certificate balance prominently
+  - [ ] Show last 4 digits of saved cards
+  - [ ] Add "New Payment Method" option
+- [ ] Implement payment source hierarchy logic:
+  1. [ ] Check for available gift certificates FIRST
+  2. [ ] Show explicit payment source selection
+  3. [ ] Require confirmation for credit card charges
+  4. [ ] Log every payment decision to PaymentAuditLog
+- [ ] Create processPayment server action with audit trail
+- [ ] Implement automatic rollback on payment failures
+- [ ] Add payment retry logic (max 2 attempts)
+- [ ] Create payment confirmation modal
+- [ ] Show clear payment status (pending, success, failed)
+- [ ] Test payment failure scenarios
+- [ ] Test gift certificate application before credit card
+- [ ] **Verify gift certificates NEVER accidentally charge credit cards**
+
+### Stripe Payment Flow
+- [ ] Create Stripe Payment Intent creation endpoint
+- [ ] Implement Stripe Elements for card input (mobile-optimized)
+- [ ] Create payment confirmation UI
+- [ ] Handle 3D Secure authentication (SCA)
+- [ ] Implement payment success callback
+- [ ] Implement payment failure handling
+- [ ] Test on iOS Safari
+- [ ] Test on Android Chrome
+- [ ] Test with various card types (US, international)
+
+### Stripe Webhooks
+- [ ] Create /app/api/webhooks/stripe route
+- [ ] Implement webhook signature verification
+- [ ] Handle payment_intent.succeeded event
+- [ ] Handle payment_intent.failed event
+- [ ] Handle charge.refunded event
+- [ ] Update Payment status in database
+- [ ] Create audit log entries for webhook events
+- [ ] Test webhook handling with Stripe CLI
+- [ ] Set up webhook endpoint in Stripe dashboard
+
+### Payment Audit Logging
+- [ ] Create audit logging utility function
+- [ ] Log payment source selection
+- [ ] Log payment attempt (method, amount, timestamp)
+- [ ] Log payment success/failure
+- [ ] Log gift certificate application
+- [ ] Log refunds and voids
+- [ ] Create audit log viewing page for admins
+- [ ] Test audit trail completeness
+
+### Receipt Generation
+- [ ] Design receipt email template
+- [ ] Create receipt PDF generator (optional)
+- [ ] Implement receipt data formatting
+- [ ] Create sendReceipt server action
+- [ ] Integrate with email service (see Phase 3)
+- [ ] Test receipt delivery
+- [ ] Add receipt resend functionality
+- [ ] Store receipt metadata in Payment model
+
+---
+
+## Phase 3: Client Features (Weeks 5-6)
+
+### Email/SMS Notification Setup
+- [ ] Choose email provider (Resend, SendGrid, or similar)
+- [ ] Set up email provider account and API keys
+- [ ] Install email provider SDK
+- [ ] Create lib/email.ts with email client
+- [ ] Choose SMS provider (Twilio recommended)
+- [ ] Set up SMS provider account and API keys
+- [ ] Install SMS provider SDK
+- [ ] Create lib/sms.ts with SMS client
+- [ ] Create notification templates folder
+
+### Notification System
+- [ ] Create Notification model (id, type, recipient, status, scheduledAt, sentAt)
+- [ ] Create notification queue system (Inngest integration)
+- [ ] Install @inngest/sdk
+- [ ] Set up Inngest account
+- [ ] Create /app/api/inngest route
+- [ ] Create appointment confirmation email template
+- [ ] Create appointment reminder email template (24hr before)
+- [ ] Create appointment confirmation SMS template
+- [ ] Create appointment reminder SMS template
+- [ ] Implement sendAppointmentConfirmation function
+- [ ] Implement sendAppointmentReminder function
+- [ ] Create notification scheduling logic
+- [ ] Test email deliverability
+- [ ] Test SMS delivery
+- [ ] Add unsubscribe mechanism
+
+### Client Management Dashboard
+- [ ] Create /app/dashboard/clients page
+- [ ] Implement client list view with search
+- [ ] Add client filtering (by name, email, phone)
+- [ ] Create client detail view
+- [ ] Show client appointment history
+- [ ] Calculate and display total spend
+- [ ] Show client visit frequency
+- [ ] Add client notes section (staff-only)
+- [ ] Create "Add Client" form
+- [ ] Create "Edit Client" form
+- [ ] Test client search performance
+
+### Public Booking Widget
+- [ ] Create /app/book/[salonSlug] public route
+- [ ] Design mobile-first booking UI
+- [ ] Create service selection step
+- [ ] Create staff selection step (or auto-assign)
+- [ ] Create date/time selection calendar
+- [ ] Show real-time availability
+- [ ] Implement conflict checking for public bookings
+- [ ] Create client information form
+- [ ] Add form validation
+- [ ] Implement progress saving (localStorage)
+- [ ] Create booking confirmation page
+- [ ] Test on iOS Safari
+- [ ] Test on Android Chrome
+- [ ] Test booking widget embedding (iframe support)
+
+### Mobile Optimization
+- [ ] Test all forms on mobile devices (iOS/Android)
+- [ ] Optimize touch targets (min 44x44px)
+- [ ] Test payment forms on mobile
+- [ ] Implement autofill support for contact forms
+- [ ] Add loading states for all async actions
+- [ ] Test offline behavior and error messages
+- [ ] Optimize images for mobile (Next.js Image component)
+- [ ] Test viewport responsiveness (320px - 768px)
+- [ ] Verify mobile booking completion rate target (>95%)
+- [ ] Add fallback to simple card form if Stripe Elements fails
+
+### Membership System
+- [ ] Create Membership model (id, clientId, salonId, tier, status, startDate, endDate, stripeSubscriptionId)
+- [ ] Create MembershipTier model (id, salonId, name, price, benefits JSON)
+- [ ] Run migration: `prisma migrate dev --name add_memberships`
+- [ ] Create membership signup flow
+- [ ] Implement Stripe subscription creation
+- [ ] Handle recurring billing webhooks (subscription events)
+- [ ] Create membership cancellation flow
+- [ ] Add membership status to client profile
+- [ ] Show membership benefits on booking page
+- [ ] Test mobile membership signup (iOS/Android)
+- [ ] Implement progress saving for interrupted signups
+- [ ] Add retry logic (max 2 attempts)
+- [ ] Test subscription lifecycle (create, renew, cancel)
+
+### Client Portal
+- [ ] Create /app/portal route (client authentication)
+- [ ] Implement client login (email/OTP or password)
+- [ ] Create client dashboard view
+- [ ] Show upcoming appointments
+- [ ] Show past appointments
+- [ ] Display membership status (if applicable)
+- [ ] Show gift certificate balance
+- [ ] Add appointment cancellation (with policy)
+- [ ] Add appointment rescheduling
+- [ ] Test client portal on mobile
+
+---
+
+## Phase 4: Migration & Polish (Weeks 7-8)
+
+### Data Import System
+- [ ] Create /app/dashboard/import page (owner-only)
+- [ ] Design CSV/Excel upload UI
+- [ ] Create file parser (support CSV, XLSX)
+- [ ] Implement data validation rules
+  - [ ] Required fields check
+  - [ ] Email format validation
+  - [ ] Phone format validation
+  - [ ] Date format validation
+- [ ] Create data preview component (table view)
+- [ ] Implement client deduplication logic (match by email/phone)
+- [ ] Create import confirmation step
+- [ ] Implement database transaction for import
+  - [ ] Begin transaction
+  - [ ] Insert clients
+  - [ ] Insert services
+  - [ ] Insert appointment history
+  - [ ] Commit or rollback on error
+- [ ] Add progress indicator during import
+- [ ] Create import success summary
+- [ ] Implement rollback option (undo import)
+- [ ] Create import error report
+- [ ] Test with sample Fresha export data
+- [ ] Test large dataset import (1000+ records)
+- [ ] Verify 100% data integrity
+
+### Service Management
+- [ ] Create /app/dashboard/services page
+- [ ] Implement service list view
+- [ ] Create "Add Service" form
+- [ ] Create "Edit Service" form
+- [ ] Add service duration and price fields
+- [ ] Implement staff assignment to services
+- [ ] Add service archive/deletion
+- [ ] Create service category organization (optional)
+- [ ] Test service CRUD operations
+
+### Staff Management
+- [ ] Create /app/dashboard/staff page (owner-only)
+- [ ] Implement staff list view
+- [ ] Create "Add Staff" form
+- [ ] Create "Edit Staff" form
+- [ ] Implement role assignment (OWNER, STAFF)
+- [ ] Add staff schedule/blocked times
+- [ ] Create staff deactivation (soft delete)
+- [ ] Test staff permissions
+
+### Blocked Times & Availability
+- [ ] Create BlockedTime model (id, staffId, startTime, endTime, reason, recurring)
+- [ ] Run migration: `prisma migrate dev --name add_blocked_times`
+- [ ] Create blocked time management UI
+- [ ] Implement recurring blocked times (lunch breaks)
+- [ ] Update conflict detection to account for blocked times
+- [ ] Test availability calculation
+
+### Database Performance Tuning
+- [ ] Analyze query performance with Prisma query logs
+- [ ] Add missing indexes (identified from slow queries)
+- [ ] Optimize appointment queries with includes
+- [ ] Implement pagination for large lists (50 items/page)
+- [ ] Add database query caching with Upstash Redis
+- [ ] Configure Upstash Redis account (free tier)
+- [ ] Implement cache invalidation strategy
+- [ ] Test p95 query response time (<100ms target)
+- [ ] Monitor connection pool usage
+- [ ] Review and optimize N+1 queries
+
+### Redis Caching Setup (Upstash)
+- [ ] Create Upstash account
+- [ ] Provision Redis database
+- [ ] Install @upstash/redis package
+- [ ] Create lib/redis.ts
+- [ ] Implement cache utility functions (get, set, invalidate)
+- [ ] Cache frequently accessed data (services, staff availability)
+- [ ] Set appropriate TTL values
+- [ ] Test cache performance improvement
+
+### Error Handling & Monitoring
+- [ ] Set up Sentry account (Team plan - $26/month)
+- [ ] Install @sentry/nextjs
+- [ ] Configure Sentry in next.config.js
+- [ ] Set up error boundaries in React components
+- [ ] Add try-catch blocks to all server actions
+- [ ] Implement user-friendly error messages
+- [ ] Create error logging for payment failures
+- [ ] Test error reporting to Sentry
+- [ ] Set up Sentry alerts for critical errors
+- [ ] Configure error rate threshold alerts
+
+### Email Template Improvements
+- [ ] Create branded email templates (HTML + plain text)
+- [ ] Add company logo and styling
+- [ ] Create appointment confirmation template
+- [ ] Create appointment reminder template
+- [ ] Create receipt email template
+- [ ] Create welcome email for new clients
+- [ ] Create password reset email
+- [ ] Test email rendering across clients (Gmail, Outlook, Apple Mail)
+- [ ] Add unsubscribe links
+
+### UI/UX Polish
+- [ ] Implement consistent loading states (skeletons)
+- [ ] Add toast notifications for user actions
+- [ ] Improve form validation messages
+- [ ] Add keyboard shortcuts for common actions
+- [ ] Implement dark mode (optional)
+- [ ] Test color contrast for accessibility
+- [ ] Add empty states for lists
+- [ ] Create 404 and error pages
+- [ ] Add favicon and meta tags
+- [ ] Test all pages on multiple browsers
+
+### Documentation
+- [ ] Write user guide for salon owners
+- [ ] Create staff training documentation
+- [ ] Write data migration guide
+- [ ] Document API endpoints (if any public APIs)
+- [ ] Create troubleshooting guide
+- [ ] Write video tutorials (screen recordings)
+- [ ] Create FAQ page
+- [ ] Document environment variable setup
+
+---
+
+## Testing & Quality Assurance
+
+### Unit Testing
+- [ ] Set up Jest and React Testing Library
+- [ ] Write tests for payment logic (CRITICAL)
+- [ ] Write tests for gift certificate validation
+- [ ] Write tests for conflict detection
+- [ ] Write tests for date/time calculations
+- [ ] Write tests for data import validation
+- [ ] Achieve >80% coverage for critical paths
+
+### Integration Testing
+- [ ] Test complete booking flow (public → payment → confirmation)
+- [ ] Test payment processing with Stripe test cards
+- [ ] Test gift certificate redemption flow
+- [ ] Test appointment creation with conflicts
+- [ ] Test data import with rollback
+- [ ] Test webhook handling
+- [ ] Test email/SMS delivery
+
+### End-to-End Testing
+- [ ] Set up Playwright or Cypress
+- [ ] Test critical user journeys
+  - [ ] Salon owner signup and setup
+  - [ ] Staff creating an appointment
+  - [ ] Client booking on mobile
+  - [ ] Payment with gift certificate
+  - [ ] Payment with credit card
+  - [ ] Membership signup on mobile
+  - [ ] Data import from CSV
+- [ ] Test cross-browser (Chrome, Safari, Firefox)
+- [ ] Test mobile devices (iOS, Android)
+
+### Payment Testing - CRITICAL
+- [ ] Test gift certificate shows BEFORE credit card option
+- [ ] Test payment with insufficient gift certificate balance
+- [ ] Test payment failure rollback
+- [ ] Test double-charge prevention
+- [ ] Test payment audit log completeness
+- [ ] Test refund processing
+- [ ] Test 3D Secure authentication
+- [ ] Verify ZERO payment errors in testing (Launch requirement ✅)
+
+### Mobile Testing
+- [ ] Test booking widget on iPhone (Safari)
+- [ ] Test booking widget on Android (Chrome)
+- [ ] Test payment form on mobile (iOS)
+- [ ] Test payment form on mobile (Android)
+- [ ] Test membership signup on mobile (iOS)
+- [ ] Test membership signup on mobile (Android)
+- [ ] Verify >95% mobile completion rate (Launch requirement ✅)
+- [ ] Test slow network conditions (3G)
+
+### Performance Testing
+- [ ] Test database response time under load
+- [ ] Verify p95 < 100ms for key queries (Launch requirement ✅)
+- [ ] Test concurrent appointment bookings
+- [ ] Test large data import performance
+- [ ] Run Lighthouse audits (target >90 performance score)
+- [ ] Test Time to First Byte (TTFB)
+- [ ] Monitor Core Web Vitals
+
+### Security Testing
+- [ ] Test authentication bypass attempts
+- [ ] Test SQL injection vulnerabilities
+- [ ] Test XSS vulnerabilities
+- [ ] Verify HTTPS enforcement
+- [ ] Test CSRF protection
+- [ ] Verify API authentication
+- [ ] Test role-based access control
+- [ ] Audit payment data handling (PCI compliance)
+- [ ] Test database connection security (SSL/TLS)
+- [ ] Verify environment variables are not exposed
+
+---
+
+## Pre-Launch Checklist
+
+### Infrastructure
+- [ ] Production database provisioned (Neon Pro - $19/month)
+- [ ] Database backups configured (point-in-time recovery)
+- [ ] Vercel production deployment configured
+- [ ] Custom domain configured (if applicable)
+- [ ] SSL certificate active
+- [ ] Environment variables set in production
+- [ ] Stripe production mode enabled
+- [ ] Webhook endpoints registered in production
+- [ ] Sentry production project configured
+- [ ] Upstash Redis production database active
+
+### Security & Compliance
+- [ ] All API endpoints authenticated
+- [ ] Rate limiting implemented
+- [ ] CORS configured correctly
+- [ ] Database SSL/TLS enforced
+- [ ] IP allowlisting configured for production DB
+- [ ] PCI compliance checklist completed (Stripe)
+- [ ] Privacy policy page created
+- [ ] Terms of service page created
+- [ ] GDPR compliance (if applicable)
+
+### Performance
+- [ ] Database indexes optimized
+- [ ] Query performance verified (<100ms p95) ✅
+- [ ] Caching strategy implemented
+- [ ] Image optimization verified
+- [ ] Bundle size optimized
+- [ ] Lighthouse score >90
+- [ ] Uptime monitoring configured (99.9% SLA target) ✅
+
+### Payment System Verification - CRITICAL
+- [ ] ✅ Zero payment processing errors in testing
+- [ ] ✅ Gift certificates never charge wrong source
+- [ ] Payment audit logs working correctly
+- [ ] Receipt generation and delivery working
+- [ ] Refund process tested
+- [ ] Stripe webhook failover tested
+
+### Data Import Verification
+- [ ] ✅ Data import from CSV with rollback
+- [ ] Sample Fresha data imports successfully
+- [ ] Data validation catches all errors
+- [ ] Deduplication working correctly
+- [ ] Import progress tracking working
+- [ ] Rollback functionality tested
+
+### Mobile Verification
+- [ ] ✅ Mobile booking works on iOS/Android
+- [ ] ✅ 95% mobile completion rate achieved
+- [ ] Touch targets appropriately sized
+- [ ] Forms work with mobile keyboards
+- [ ] Autofill supported
+- [ ] Offline error handling graceful
+
+### Documentation & Support
+- [ ] User documentation complete
+- [ ] Video tutorials recorded
+- [ ] FAQ page live
+- [ ] Support email configured
+- [ ] Support response time process (<2 hour target)
+- [ ] Onboarding email sequence ready
+
+---
+
+## Launch Strategy
+
+### Week 1: Soft Launch (5 Beta Salons)
+- [ ] Identify 5 beta salons from personal network
+- [ ] Schedule onboarding calls
+- [ ] Manually migrate data for beta users
+- [ ] Set up daily check-in schedule
+- [ ] Monitor database performance dashboard
+- [ ] Document all issues in tracking system
+- [ ] Deploy rapid bug fixes (same-day)
+- [ ] Collect initial feedback
+
+### Week 2-4: Controlled Growth (25 Salons)
+- [ ] Open applications for early access
+- [ ] Onboard 5 new salons per week
+- [ ] Monitor database scaling (Neon autoscaling)
+- [ ] Track migration success rate (target: 100%)
+- [ ] Collect testimonials from successful migrations
+- [ ] Create case studies
+- [ ] Refine onboarding process based on feedback
+- [ ] Monitor payment error rate (<0.1% target)
+
+### Month 2: Public Launch
+- [ ] Prepare ProductHunt launch materials
+  - [ ] Screenshots and demo video
+  - [ ] Launch post copy
+  - [ ] Founder introduction
+- [ ] Create direct outreach campaign to Fresha users
+- [ ] Set up referral program ($20 credit per referral)
+- [ ] Activate social media presence
+- [ ] Monitor server load and scale as needed
+- [ ] Track key metrics daily
+
+---
+
+## Success Metrics Tracking
+
+### Launch Requirements (Must Have) ✅
+- [ ] ✅ Zero payment processing errors in testing
+- [ ] ✅ Mobile booking works on iOS/Android
+- [ ] ✅ Gift certificates never charge wrong source
+- [ ] ✅ Data import from CSV with rollback
+- [ ] ✅ Database response time < 100ms (p95)
+- [ ] ✅ 99.9% uptime SLA
+
+### Week 4 Post-Launch Metrics
+- [ ] 10 active salons
+- [ ] < 0.1% payment error rate
+- [ ] 95% mobile completion rate
+- [ ] Zero data loss incidents
+- [ ] < 2 hour support response time
+
+### Monthly Metrics (Ongoing)
+- [ ] Monthly churn rate < 5%
+- [ ] Payment error rate < 0.1%
+- [ ] Database uptime > 99.9%
+- [ ] Average support response < 2 hours
+- [ ] Customer satisfaction score (track via surveys)
+
+---
+
+## Risk Mitigation
+
+### Database Connection Limits (Low Probability, High Impact)
+- [x] Neon connection pooling configured
+- [ ] Connection pool monitoring dashboard
+- [ ] Alert on high connection usage (>80%)
+- [ ] Connection leak detection and testing
+
+### Payment Processing Bugs (Medium Probability, High Impact)
+- [ ] Extensive unit tests for payment logic
+- [ ] Payment audit logs for every transaction
+- [ ] Manual QA for all payment flows
+- [ ] Real-time payment error monitoring
+- [ ] Automated alerts for failed payments
+
+### Data Migration Errors (Medium Probability, High Impact)
+- [ ] Database transactions with rollback
+- [ ] Data preview before import
+- [ ] Import validation with error reports
+- [ ] Test with real Fresha export data
+- [ ] Manual verification for beta salons
+
+### Database Failover Issues (Low Probability, High Impact)
+- [ ] Neon automatic failover enabled
+- [ ] Point-in-time recovery tested
+- [ ] Weekly database backups to S3
+- [ ] Disaster recovery plan documented
+- [ ] Recovery tested quarterly
+
+---
+
+## Out of Scope (Not in MVP) ❌
+
+Items explicitly NOT included in initial 8-week build:
+- ❌ Marketplace/discovery features
+- ❌ Inventory management
+- ❌ Advanced analytics/reporting
+- ❌ Multi-location support (schema ready, UI not built)
+- ❌ Custom mobile apps (PWA only)
+- ❌ POS system integration
+- ❌ Email marketing tools
+- ❌ Loyalty programs beyond basic memberships
+
+---
+
+## Notes
+
+- **Payment Processing**: This is the MOST CRITICAL feature. Triple-check all payment flows.
+- **Mobile Optimization**: Public booking must work flawlessly on mobile (>95% completion rate).
+- **Data Integrity**: 100% migration success rate is required for trust.
+- **Performance**: Database p95 < 100ms is crucial for good UX.
+- **Audit Logging**: Every payment decision must be logged for debugging disputes.
+
+**Pioneer Pricing**: First 50 customers locked in at $3/staff/month for 12 months (normally $5).
+
+---
+
+**Total Estimated Tasks**: ~450 items
+**Average per Week**: ~56 items
+**Critical Path**: Payment System → Mobile Booking → Data Import

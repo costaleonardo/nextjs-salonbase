@@ -17,37 +17,37 @@
 - [x] Set up Vercel deployment pipeline
 
 ### Database Setup (Neon PostgreSQL)
-- [ ] Create Neon account and project
-- [ ] Provision production database (Pro plan - $19/month)
-- [ ] Provision development database (Free tier or branch)
-- [ ] Set up environment variables (DATABASE_URL_POOLED, DATABASE_URL_DIRECT)
-- [ ] Configure SSL/TLS connections
+- [x] Create Neon account and project
+- [x] Provision production database (Pro plan - $19/month)
+- [x] Provision development database (Free tier or branch)
+- [x] Set up environment variables (DATABASE_URL_POOLED, DATABASE_URL_DIRECT)
+- [x] Configure SSL/TLS connections
 - [ ] Set up IP allowlisting for production
-- [ ] Test connection pooling configuration
+- [x] Test connection pooling configuration
 - [ ] Configure point-in-time recovery (7 days)
 - [ ] Set up database branching workflow
 
 ### Prisma ORM Setup
-- [ ] Install Prisma dependencies (@prisma/client, @neondatabase/serverless, @prisma/adapter-neon)
-- [ ] Create prisma/schema.prisma with datasource configuration
-- [ ] Implement lib/db.ts with Neon adapter and connection pooling
-- [ ] Configure Prisma logging (development vs production)
-- [ ] Set up migration scripts in package.json
+- [x] Install Prisma dependencies (@prisma/client, @neondatabase/serverless, @prisma/adapter-neon)
+- [x] Create prisma/schema.prisma with datasource configuration
+- [x] Implement lib/db.ts with Neon adapter and connection pooling
+- [x] Configure Prisma logging (development vs production)
+- [x] Set up migration scripts in package.json
 
 ### Database Schema - Core Models
-- [ ] Create User model (id, email, role, salonId, timestamps)
-- [ ] Add User indexes (salonId, email)
-- [ ] Create Role enum (OWNER, STAFF, CLIENT)
-- [ ] Create Salon model (id, name, settings, timestamps)
-- [ ] Create Client model (id, salonId, name, email, phone, notes)
-- [ ] Add Client indexes (salonId, email, phone)
-- [ ] Create Service model (id, salonId, name, duration, price, staffIds)
-- [ ] Add Service indexes (salonId)
-- [ ] Create AppointmentStatus enum (SCHEDULED, COMPLETED, CANCELLED, NO_SHOW)
-- [ ] Create Appointment model (id, clientId, staffId, serviceId, datetime, status)
-- [ ] Add Appointment indexes (datetime, staffId+datetime, clientId)
-- [ ] Run initial migration: `prisma migrate dev --name init`
-- [ ] Test schema with basic queries
+- [x] Create User model (id, email, role, salonId, timestamps)
+- [x] Add User indexes (salonId, email)
+- [x] Create Role enum (OWNER, STAFF, CLIENT)
+- [x] Create Salon model (id, name, settings, timestamps)
+- [x] Create Client model (id, salonId, name, email, phone, notes)
+- [x] Add Client indexes (salonId, email, phone)
+- [x] Create Service model (id, salonId, name, duration, price, staffIds)
+- [x] Add Service indexes (salonId)
+- [x] Create AppointmentStatus enum (SCHEDULED, COMPLETED, CANCELLED, NO_SHOW)
+- [x] Create Appointment model (id, clientId, staffId, serviceId, datetime, status)
+- [x] Add Appointment indexes (datetime, staffId+datetime, clientId)
+- [x] Run initial migration: `prisma migrate dev --name init`
+- [x] Test schema with basic queries
 
 ### Authentication (NextAuth.js)
 - [ ] Install next-auth and dependencies

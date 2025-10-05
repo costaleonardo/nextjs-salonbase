@@ -104,7 +104,7 @@
 - [x] Install stripe and @stripe/stripe-js packages
 - [x] Set up Stripe API keys in environment variables
 - [x] Create lib/stripe.ts with Stripe client initialization
-- [ ] Configure webhook endpoint secret
+- [x] Configure webhook endpoint secret
 - [x] Test Stripe connection in development
 
 ### Payment Schema
@@ -161,14 +161,14 @@
 - [x] Test with various card types (US, international)
 
 ### Stripe Webhooks
-- [ ] Create /app/api/webhooks/stripe route
-- [ ] Implement webhook signature verification
-- [ ] Handle payment_intent.succeeded event
-- [ ] Handle payment_intent.failed event
-- [ ] Handle charge.refunded event
-- [ ] Update Payment status in database
-- [ ] Create audit log entries for webhook events
-- [ ] Test webhook handling with Stripe CLI
+- [x] Create /app/api/webhooks/stripe route
+- [x] Implement webhook signature verification
+- [x] Handle payment_intent.succeeded event
+- [x] Handle payment_intent.failed event
+- [x] Handle charge.refunded event
+- [x] Update Payment status in database
+- [x] Create audit log entries for webhook events
+- [x] Test webhook handling with Stripe CLI
 - [ ] Set up webhook endpoint in Stripe dashboard
 
 ### Payment Audit Logging

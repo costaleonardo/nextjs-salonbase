@@ -481,6 +481,120 @@ export async function getPaymentAuditLog(paymentId: string) {
 }
 
 /**
+ * Confirm a payment after successful Stripe Payment Intent
+ * This is called after the client has successfully confirmed payment with Stripe Elements
+ */
+export async function confirmStripePayment(data: {
+  appointmentId: string
+  stripePaymentIntentId: string
+}) {
+  try {
+    const session = await auth()
+    if (!session?.user?.salonId) {
+      return { success: false, error: 'Unauthorized' }
+    }
+
+    // Verify the Payment Intent with Stripe
+    const paymentIntent = await stripe.paymentIntents.retrieve(
+      data.stripePaymentIntentId
+    )
+
+    if (paymentIntent.status !== 'succeeded') {
+      return {
+        success: false,
+        error: `Payment not completed. Status: ${paymentIntent.status}`
+      }
+    }
+
+    // Verify appointment exists and belongs to user's salon
+    const appointment = await db.appointment.findFirst({
+      where: {
+        id: data.appointmentId,
+        salonId: session.user.salonId
+      },
+      include: {
+        payment: true
+      }
+    })
+
+    if (!appointment) {
+      return { success: false, error: 'Appointment not found' }
+    }
+
+    // Check if payment already exists
+    if (appointment.payment) {
+      // Update existing payment if it was pending
+      if (appointment.payment.status === 'PENDING') {
+        const updatedPayment = await db.payment.update({
+          where: { id: appointment.payment.id },
+          data: {
+            status: 'COMPLETED',
+            stripePaymentId: data.stripePaymentIntentId,
+            metadata: {
+              ...(appointment.payment.metadata as object),
+              completedAt: new Date().toISOString(),
+              completedVia: 'stripe_elements'
+            }
+          }
+        })
+
+        await logPaymentAudit(updatedPayment.id, 'payment_confirmed_via_stripe_elements', {
+          stripePaymentIntentId: data.stripePaymentIntentId,
+          timestamp: new Date().toISOString()
+        })
+
+        return {
+          success: true,
+          data: {
+            paymentId: updatedPayment.id,
+            amount: updatedPayment.amount
+          }
+        }
+      }
+
+      return { success: false, error: 'Payment already completed' }
+    }
+
+    // Create new payment record
+    const amount = paymentIntent.amount / 100 // Convert from cents
+    const payment = await db.payment.create({
+      data: {
+        appointmentId: data.appointmentId,
+        amount,
+        method: 'CREDIT_CARD',
+        status: 'COMPLETED',
+        stripePaymentId: data.stripePaymentIntentId,
+        metadata: {
+          processedBy: session.user.id,
+          completedAt: new Date().toISOString(),
+          completedVia: 'stripe_elements'
+        }
+      }
+    })
+
+    await logPaymentAudit(payment.id, 'payment_created_from_stripe_elements', {
+      stripePaymentIntentId: data.stripePaymentIntentId,
+      amount,
+      timestamp: new Date().toISOString()
+    })
+
+    return {
+      success: true,
+      data: {
+        paymentId: payment.id,
+        amount
+      }
+    }
+  } catch (error) {
+    console.error('Error confirming Stripe payment:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to confirm payment'
+    }
+  }
+}
+
+/**
  * Refund a payment
  */
 export async function refundPayment(paymentId: string, reason?: string) {

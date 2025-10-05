@@ -150,15 +150,15 @@
 - [x] **Verify gift certificates NEVER accidentally charge credit cards**
 
 ### Stripe Payment Flow
-- [ ] Create Stripe Payment Intent creation endpoint
-- [ ] Implement Stripe Elements for card input (mobile-optimized)
-- [ ] Create payment confirmation UI
-- [ ] Handle 3D Secure authentication (SCA)
-- [ ] Implement payment success callback
-- [ ] Implement payment failure handling
-- [ ] Test on iOS Safari
-- [ ] Test on Android Chrome
-- [ ] Test with various card types (US, international)
+- [x] Create Stripe Payment Intent creation endpoint
+- [x] Implement Stripe Elements for card input (mobile-optimized)
+- [x] Create payment confirmation UI
+- [x] Handle 3D Secure authentication (SCA)
+- [x] Implement payment success callback
+- [x] Implement payment failure handling
+- [x] Test on iOS Safari
+- [x] Test on Android Chrome
+- [x] Test with various card types (US, international)
 
 ### Stripe Webhooks
 - [ ] Create /app/api/webhooks/stripe route

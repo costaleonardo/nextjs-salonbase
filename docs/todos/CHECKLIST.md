@@ -196,15 +196,15 @@
 ## Phase 3: Client Features (Weeks 5-6)
 
 ### Email/SMS Notification Setup
-- [ ] Choose email provider (Resend, SendGrid, or similar)
-- [ ] Set up email provider account and API keys
-- [ ] Install email provider SDK
-- [ ] Create lib/email.ts with email client
-- [ ] Choose SMS provider (Twilio recommended)
-- [ ] Set up SMS provider account and API keys
-- [ ] Install SMS provider SDK
-- [ ] Create lib/sms.ts with SMS client
-- [ ] Create notification templates folder
+- [x] Choose email provider (Resend, SendGrid, or similar)
+- [x] Set up email provider account and API keys
+- [x] Install email provider SDK
+- [x] Create lib/email.ts with email client
+- [x] Choose SMS provider (Twilio recommended)
+- [x] Set up SMS provider account and API keys
+- [x] Install SMS provider SDK
+- [x] Create lib/sms.ts with SMS client
+- [x] Create notification templates folder
 
 ### Notification System
 - [ ] Create Notification model (id, type, recipient, status, scheduledAt, sentAt)
@@ -212,10 +212,10 @@
 - [ ] Install @inngest/sdk
 - [ ] Set up Inngest account
 - [ ] Create /app/api/inngest route
-- [ ] Create appointment confirmation email template
-- [ ] Create appointment reminder email template (24hr before)
-- [ ] Create appointment confirmation SMS template
-- [ ] Create appointment reminder SMS template
+- [x] Create appointment confirmation email template
+- [x] Create appointment reminder email template (24hr before)
+- [x] Create appointment confirmation SMS template
+- [x] Create appointment reminder SMS template
 - [ ] Implement sendAppointmentConfirmation function
 - [ ] Implement sendAppointmentReminder function
 - [ ] Create notification scheduling logic
@@ -385,11 +385,11 @@
 - [ ] Configure error rate threshold alerts
 
 ### Email Template Improvements
-- [ ] Create branded email templates (HTML + plain text)
+- [x] Create branded email templates (HTML + plain text)
 - [ ] Add company logo and styling
-- [ ] Create appointment confirmation template
-- [ ] Create appointment reminder template
-- [ ] Create receipt email template
+- [x] Create appointment confirmation template
+- [x] Create appointment reminder template
+- [x] Create receipt email template
 - [ ] Create welcome email for new clients
 - [ ] Create password reset email
 - [ ] Test email rendering across clients (Gmail, Outlook, Apple Mail)

@@ -189,6 +189,7 @@ export async function sendReceipt(paymentId: string, recipientEmail?: string) {
 
     // Update payment metadata with receipt sent information
     const currentMetadata = (payment.metadata as Record<string, any>) || {}
+    const emailId = emailResult.data && 'id' in emailResult.data ? emailResult.data.id : undefined
     await db.payment.update({
       where: { id: paymentId },
       data: {
@@ -197,7 +198,7 @@ export async function sendReceipt(paymentId: string, recipientEmail?: string) {
           receiptSent: true,
           receiptSentAt: new Date().toISOString(),
           receiptSentTo: toEmail,
-          receiptEmailId: emailResult.data?.id,
+          receiptEmailId: emailId,
         },
       },
     })
@@ -207,7 +208,7 @@ export async function sendReceipt(paymentId: string, recipientEmail?: string) {
       data: {
         receiptNumber: receiptDataResult.data.receiptNumber,
         sentTo: toEmail,
-        emailId: emailResult.data?.id,
+        emailId,
       },
     }
   } catch (error) {

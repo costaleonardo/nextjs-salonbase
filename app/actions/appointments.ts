@@ -4,6 +4,13 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { AppointmentStatus, Role } from "@prisma/client"
 import { revalidatePath } from "next/cache"
+import {
+  scheduleAppointmentConfirmation,
+  scheduleAppointmentReminder,
+  sendAppointmentCancellation,
+  sendAppointmentRescheduled,
+  cancelPendingReminder,
+} from "@/lib/notifications"
 
 // ============================================
 // Types
@@ -258,7 +265,16 @@ export async function createAppointment(
       },
     })
 
-    // 8. Revalidate appointments page
+    // 8. Schedule notifications (non-blocking)
+    try {
+      await scheduleAppointmentConfirmation(appointment.id)
+      await scheduleAppointmentReminder(appointment.id, appointment.datetime)
+    } catch (error) {
+      console.error('Failed to schedule notifications:', error)
+      // Don't fail the appointment creation if notifications fail
+    }
+
+    // 9. Revalidate appointments page
     revalidatePath('/dashboard/appointments')
 
     return { success: true, data: { id: appointment.id } }
@@ -335,7 +351,10 @@ export async function updateAppointment(
       }
     }
 
-    // 6. Update appointment
+    // 6. Check if datetime is being updated (rescheduling)
+    const isRescheduling = input.datetime && new Date(input.datetime).getTime() !== existingAppointment.datetime.getTime()
+
+    // 7. Update appointment
     const updatedAppointment = await db.appointment.update({
       where: { id: input.id },
       data: {
@@ -348,7 +367,21 @@ export async function updateAppointment(
       },
     })
 
-    // 7. Revalidate appointments page
+    // 8. Send rescheduling notification if datetime changed (non-blocking)
+    if (isRescheduling) {
+      try {
+        await sendAppointmentRescheduled(
+          updatedAppointment.id,
+          existingAppointment.datetime,
+          updatedAppointment.datetime
+        )
+      } catch (error) {
+        console.error('Failed to send rescheduling notification:', error)
+        // Don't fail the update if notification fails
+      }
+    }
+
+    // 9. Revalidate appointments page
     revalidatePath('/dashboard/appointments')
 
     return { success: true, data: { id: updatedAppointment.id } }
@@ -401,7 +434,16 @@ export async function cancelAppointment(
       },
     })
 
-    // 6. Revalidate appointments page
+    // 6. Send cancellation notification and cancel pending reminders (non-blocking)
+    try {
+      await sendAppointmentCancellation(appointmentId)
+      await cancelPendingReminder(appointmentId)
+    } catch (error) {
+      console.error('Failed to send cancellation notification:', error)
+      // Don't fail the cancellation if notification fails
+    }
+
+    // 7. Revalidate appointments page
     revalidatePath('/dashboard/appointments')
 
     return { success: true, data: { id: updatedAppointment.id } }

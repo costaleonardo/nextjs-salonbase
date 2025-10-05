@@ -14,6 +14,7 @@ import {
   Section,
   Text,
   Hr,
+  Link,
 } from '@react-email/components'
 
 interface AppointmentReminderEmailProps {
@@ -25,6 +26,7 @@ interface AppointmentReminderEmailProps {
   salonName: string
   salonAddress?: string
   salonPhone?: string
+  clientId?: string
 }
 
 export const AppointmentReminderEmail = ({
@@ -36,7 +38,12 @@ export const AppointmentReminderEmail = ({
   salonName,
   salonAddress,
   salonPhone,
+  clientId,
 }: AppointmentReminderEmailProps) => {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const unsubscribeUrl = clientId
+    ? `${baseUrl}/api/unsubscribe?clientId=${clientId}&type=email`
+    : null
   return (
     <Html>
       <Head />
@@ -86,6 +93,14 @@ export const AppointmentReminderEmail = ({
             We look forward to seeing you! If you need to reschedule or cancel, please contact us
             as soon as possible.
           </Text>
+
+          {unsubscribeUrl && (
+            <Text style={unsubscribe}>
+              <Link href={unsubscribeUrl} style={unsubscribeLink}>
+                Unsubscribe from email notifications
+              </Link>
+            </Text>
+          )}
         </Container>
       </Body>
     </Html>
@@ -160,4 +175,18 @@ const footer = {
   lineHeight: '20px',
   padding: '0 20px',
   marginTop: '32px',
+}
+
+const unsubscribe = {
+  color: '#8898aa',
+  fontSize: '12px',
+  lineHeight: '16px',
+  padding: '0 20px',
+  marginTop: '16px',
+  textAlign: 'center' as const,
+}
+
+const unsubscribeLink = {
+  color: '#6b7280',
+  textDecoration: 'underline',
 }

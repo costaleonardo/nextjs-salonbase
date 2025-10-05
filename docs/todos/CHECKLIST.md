@@ -237,20 +237,20 @@
 - [x] Test client search performance
 
 ### Public Booking Widget
-- [ ] Create /app/book/[salonSlug] public route
-- [ ] Design mobile-first booking UI
-- [ ] Create service selection step
-- [ ] Create staff selection step (or auto-assign)
-- [ ] Create date/time selection calendar
-- [ ] Show real-time availability
-- [ ] Implement conflict checking for public bookings
-- [ ] Create client information form
-- [ ] Add form validation
-- [ ] Implement progress saving (localStorage)
-- [ ] Create booking confirmation page
-- [ ] Test on iOS Safari
-- [ ] Test on Android Chrome
-- [ ] Test booking widget embedding (iframe support)
+- [x] Create /app/book/[salonSlug] public route
+- [x] Design mobile-first booking UI
+- [x] Create service selection step
+- [x] Create staff selection step (or auto-assign)
+- [x] Create date/time selection calendar
+- [x] Show real-time availability
+- [x] Implement conflict checking for public bookings
+- [x] Create client information form
+- [x] Add form validation
+- [x] Implement progress saving (localStorage)
+- [x] Create booking confirmation page
+- [x] Test on iOS Safari
+- [x] Test on Android Chrome
+- [x] Test booking widget embedding (iframe support)
 
 ### Mobile Optimization
 - [ ] Test all forms on mobile devices (iOS/Android)

@@ -49,7 +49,7 @@ export const inngest = new Inngest({
 // Helper function to update notification status
 async function updateNotificationStatus(
   notificationId: string,
-  status: "SENT" | "FAILED",
+  status: "SENT" | "FAILED" | "CANCELLED",
   error?: string
 ) {
   await db.notification.update({
@@ -101,13 +101,13 @@ export const sendAppointmentConfirmationNotification = inngest.createFunction(
             month: 'long',
             day: 'numeric',
             year: 'numeric',
-          }).format(appointment.datetime);
+          }).format(new Date(appointment.datetime));
 
           const appointmentTime = new Intl.DateTimeFormat('en-US', {
             hour: 'numeric',
             minute: '2-digit',
             hour12: true,
-          }).format(appointment.datetime);
+          }).format(new Date(appointment.datetime));
 
           await sendEmailFromComponent({
             to: client.email!,
@@ -136,11 +136,24 @@ export const sendAppointmentConfirmationNotification = inngest.createFunction(
     if (client.phone && client.smsNotificationsEnabled) {
       await step.run("send-confirmation-sms", async () => {
         try {
+          const datetimeObj = new Date(appointment.datetime);
+          const appointmentDate = new Intl.DateTimeFormat('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+          }).format(datetimeObj);
+
+          const appointmentTime = new Intl.DateTimeFormat('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+          }).format(datetimeObj);
+
           const smsMessage = appointmentConfirmationSMS({
-            clientName: client.name,
             salonName: salon.name,
             serviceName: service.name,
-            dateTime: appointment.datetime,
+            appointmentDate,
+            appointmentTime,
           });
 
           await sendSMS({
@@ -212,13 +225,13 @@ export const sendAppointmentReminderNotification = inngest.createFunction(
             month: 'long',
             day: 'numeric',
             year: 'numeric',
-          }).format(appointment.datetime);
+          }).format(new Date(appointment.datetime));
 
           const appointmentTime = new Intl.DateTimeFormat('en-US', {
             hour: 'numeric',
             minute: '2-digit',
             hour12: true,
-          }).format(appointment.datetime);
+          }).format(new Date(appointment.datetime));
 
           await sendEmailFromComponent({
             to: client.email!,
@@ -229,7 +242,6 @@ export const sendAppointmentReminderNotification = inngest.createFunction(
               staffName: staff.name,
               appointmentDate,
               appointmentTime,
-              price: service.price.toString(),
               salonName: salon.name,
               salonAddress: salon.address || "",
               salonPhone: salon.phone || "",
@@ -247,11 +259,17 @@ export const sendAppointmentReminderNotification = inngest.createFunction(
     if (client.phone && client.smsNotificationsEnabled) {
       await step.run("send-reminder-sms", async () => {
         try {
+          const datetimeObj = new Date(appointment.datetime);
+          const appointmentTime = new Intl.DateTimeFormat('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+          }).format(datetimeObj);
+
           const smsMessage = appointmentReminderSMS({
-            clientName: client.name,
             salonName: salon.name,
             serviceName: service.name,
-            dateTime: appointment.datetime,
+            appointmentTime,
           });
 
           await sendSMS({
@@ -303,17 +321,29 @@ export const sendAppointmentCancellationNotification = inngest.createFunction(
       throw new Error("Appointment not found");
     }
 
-    const { client, service, salon } = appointment;
+    const { client, salon } = appointment;
 
     // Send SMS if client has phone and SMS notifications are enabled
     if (client.phone && client.smsNotificationsEnabled) {
       await step.run("send-cancellation-sms", async () => {
         try {
+          const datetimeObj = new Date(appointment.datetime);
+          const appointmentDate = new Intl.DateTimeFormat('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+          }).format(datetimeObj);
+
+          const appointmentTime = new Intl.DateTimeFormat('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+          }).format(datetimeObj);
+
           const smsMessage = appointmentCancellationSMS({
-            clientName: client.name,
             salonName: salon.name,
-            serviceName: service.name,
-            dateTime: appointment.datetime,
+            appointmentDate,
+            appointmentTime,
           });
 
           await sendSMS({
@@ -371,12 +401,24 @@ export const sendAppointmentRescheduledNotification = inngest.createFunction(
     if (client.phone && client.smsNotificationsEnabled) {
       await step.run("send-rescheduled-sms", async () => {
         try {
+          const newDatetimeObj = new Date(appointment.datetime);
+          const newDate = new Intl.DateTimeFormat('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+          }).format(newDatetimeObj);
+
+          const newTime = new Intl.DateTimeFormat('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+          }).format(newDatetimeObj);
+
           const smsMessage = appointmentRescheduledSMS({
-            clientName: client.name,
             salonName: salon.name,
             serviceName: service.name,
-            oldDateTime: new Date(oldDateTime),
-            newDateTime: appointment.datetime,
+            newDate,
+            newTime,
           });
 
           await sendSMS({

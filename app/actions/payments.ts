@@ -17,11 +17,12 @@ import { PaymentMethod, PaymentStatus } from '@prisma/client'
  * 5. Explicit user confirmation required before charging credit cards
  */
 
-interface PaymentAuditLogEntry {
-  action: string
-  details: Record<string, any>
-  timestamp: Date
-}
+// Audit log entry type - currently unused but kept for future reference
+// interface PaymentAuditLogEntry {
+//   action: string
+//   details: Record<string, any>
+//   timestamp: Date
+// }
 
 /**
  * Logs an entry to the payment audit log
@@ -168,7 +169,7 @@ export async function processPayment(data: {
       }
 
       // Update payment status to COMPLETED
-      const updatedPayment = await db.payment.update({
+      await db.payment.update({
         where: { id: payment.id },
         data: {
           status: PaymentStatus.COMPLETED,

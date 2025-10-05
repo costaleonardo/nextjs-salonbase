@@ -136,9 +136,10 @@ export function PaymentWithConfirmation({
     <>
       <button
         onClick={() => setShowConfirmation(true)}
-        className="w-full bg-blue-600 text-white py-3 rounded-lg"
+        disabled={isProcessing}
+        className="w-full bg-blue-600 text-white py-3 rounded-lg disabled:opacity-50"
       >
-        Review & Pay
+        {isProcessing ? 'Processing...' : 'Review & Pay'}
       </button>
 
       <PaymentConfirmationDialog
@@ -221,7 +222,7 @@ export function CompletePaymentFlow({ appointmentId, amount }: {
   const handleCheckGiftCert = async () => {
     const result = await checkGiftCertificateBalance(giftCertCode)
     if (result.success && result.data) {
-      setGiftCertBalance(result.data.balance)
+      setGiftCertBalance(Number(result.data.balance))
     }
   }
 

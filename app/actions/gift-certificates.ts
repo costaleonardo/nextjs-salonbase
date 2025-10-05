@@ -152,7 +152,7 @@ export async function checkGiftCertificateBalance(code: string) {
     }
 
     // Check if balance is zero
-    if (certificate.balance <= 0) {
+    if (Number(certificate.balance) <= 0) {
       return {
         success: false,
         error: 'Gift certificate has no remaining balance',
@@ -196,7 +196,7 @@ export async function redeemGiftCertificate(data: {
       const certificate = await tx.giftCertificate.findFirst({
         where: {
           code: normalizedCode,
-          salonId: session.user.salonId
+          salonId: session.user.salonId || undefined
         }
       })
 
@@ -210,7 +210,7 @@ export async function redeemGiftCertificate(data: {
         throw new Error('Gift certificate has expired')
       }
 
-      if (certificate.balance <= 0) {
+      if (Number(certificate.balance) <= 0) {
         throw new Error('Gift certificate has no remaining balance')
       }
 

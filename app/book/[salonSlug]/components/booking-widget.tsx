@@ -8,6 +8,7 @@ import { DateTimeSelection } from './datetime-selection'
 import { ClientForm } from './client-form'
 import { BookingConfirmation } from './booking-confirmation'
 import { ProgressIndicator } from './progress-indicator'
+import { OfflineBanner } from '@/components/ui/offline-banner'
 
 type BookingStep = 'service' | 'staff' | 'datetime' | 'client-info' | 'confirmation'
 
@@ -88,11 +89,13 @@ export function BookingWidget({ salon }: { salon: SalonWithRelations }) {
   const selectedStaff = salon.users.find((u) => u.id === bookingData.staffId)
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-      {/* Progress Indicator */}
-      {currentStep !== 'confirmation' && (
-        <ProgressIndicator currentStep={currentStep} />
-      )}
+    <>
+      <OfflineBanner />
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        {/* Progress Indicator */}
+        {currentStep !== 'confirmation' && (
+          <ProgressIndicator currentStep={currentStep} />
+        )}
 
       {/* Step Content */}
       <div className="p-4 sm:p-6">
@@ -157,5 +160,6 @@ export function BookingWidget({ salon }: { salon: SalonWithRelations }) {
         )}
       </div>
     </div>
+    </>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { getAvailableTimeSlots } from '@/app/actions/public-bookings'
+import { TimeSlotsSkeleton } from '@/components/ui/loading-skeleton'
 
 type DateTimeSelectionProps = {
   salonId: string
@@ -148,12 +149,7 @@ export function DateTimeSelection({
       <div>
         <h3 className="text-sm font-medium text-gray-700 mb-3">Select Time</h3>
 
-        {isLoading && (
-          <div className="text-center py-8">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="text-sm text-gray-500 mt-2">Loading available times...</p>
-          </div>
-        )}
+        {isLoading && <TimeSlotsSkeleton />}
 
         {error && (
           <div className="text-center py-8">

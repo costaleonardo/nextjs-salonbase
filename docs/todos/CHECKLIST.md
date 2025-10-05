@@ -253,16 +253,16 @@
 - [x] Test booking widget embedding (iframe support)
 
 ### Mobile Optimization
-- [ ] Test all forms on mobile devices (iOS/Android)
-- [ ] Optimize touch targets (min 44x44px)
-- [ ] Test payment forms on mobile
-- [ ] Implement autofill support for contact forms
-- [ ] Add loading states for all async actions
-- [ ] Test offline behavior and error messages
-- [ ] Optimize images for mobile (Next.js Image component)
-- [ ] Test viewport responsiveness (320px - 768px)
-- [ ] Verify mobile booking completion rate target (>95%)
-- [ ] Add fallback to simple card form if Stripe Elements fails
+- [x] Test all forms on mobile devices (iOS/Android)
+- [x] Optimize touch targets (min 44x44px)
+- [x] Test payment forms on mobile
+- [x] Implement autofill support for contact forms
+- [x] Add loading states for all async actions
+- [x] Test offline behavior and error messages
+- [x] Optimize images for mobile (Next.js Image component)
+- [x] Test viewport responsiveness (320px - 768px)
+- [x] Verify mobile booking completion rate target (>95%)
+- [x] Add fallback to simple card form if Stripe Elements fails
 
 ### Membership System
 - [ ] Create Membership model (id, clientId, salonId, tier, status, startDate, endDate, stripeSubscriptionId)

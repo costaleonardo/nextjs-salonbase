@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { stripe, DEFAULT_CURRENCY, MINIMUM_CHARGE_AMOUNT } from '@/lib/stripe'
 import { redeemGiftCertificate } from './gift-certificates'
+import { sendReceipt } from './receipts'
 import { PaymentMethod, PaymentStatus } from '@prisma/client'
 
 /**
@@ -189,6 +190,17 @@ export async function processPayment(data: {
         method: data.paymentSource.type,
         stripePaymentId: paymentResult.stripePaymentId,
         timestamp: new Date().toISOString()
+      })
+
+      // Send receipt email automatically (non-blocking)
+      // Don't wait for email to complete - let payment succeed even if email fails
+      sendReceipt(payment.id).catch(error => {
+        console.error('Failed to send receipt email:', error)
+        // Log to audit trail but don't fail the payment
+        logPaymentAudit(payment.id, 'receipt_send_failed', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          timestamp: new Date().toISOString()
+        })
       })
 
       return {
@@ -544,6 +556,15 @@ export async function confirmStripePayment(data: {
           timestamp: new Date().toISOString()
         })
 
+        // Send receipt email automatically (non-blocking)
+        sendReceipt(updatedPayment.id).catch(error => {
+          console.error('Failed to send receipt email:', error)
+          logPaymentAudit(updatedPayment.id, 'receipt_send_failed', {
+            error: error instanceof Error ? error.message : 'Unknown error',
+            timestamp: new Date().toISOString()
+          })
+        })
+
         return {
           success: true,
           data: {
@@ -577,6 +598,15 @@ export async function confirmStripePayment(data: {
       stripePaymentIntentId: data.stripePaymentIntentId,
       amount,
       timestamp: new Date().toISOString()
+    })
+
+    // Send receipt email automatically (non-blocking)
+    sendReceipt(payment.id).catch(error => {
+      console.error('Failed to send receipt email:', error)
+      logPaymentAudit(payment.id, 'receipt_send_failed', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      })
     })
 
     return {

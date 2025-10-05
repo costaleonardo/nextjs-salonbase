@@ -207,21 +207,21 @@
 - [x] Create notification templates folder
 
 ### Notification System
-- [ ] Create Notification model (id, type, recipient, status, scheduledAt, sentAt)
-- [ ] Create notification queue system (Inngest integration)
-- [ ] Install @inngest/sdk
+- [x] Create Notification model (id, type, recipient, status, scheduledAt, sentAt)
+- [x] Create notification queue system (Inngest integration)
+- [x] Install @inngest/sdk
 - [ ] Set up Inngest account
-- [ ] Create /app/api/inngest route
+- [x] Create /app/api/inngest route
 - [x] Create appointment confirmation email template
 - [x] Create appointment reminder email template (24hr before)
 - [x] Create appointment confirmation SMS template
 - [x] Create appointment reminder SMS template
-- [ ] Implement sendAppointmentConfirmation function
-- [ ] Implement sendAppointmentReminder function
-- [ ] Create notification scheduling logic
+- [x] Implement sendAppointmentConfirmation function
+- [x] Implement sendAppointmentReminder function
+- [x] Create notification scheduling logic
 - [ ] Test email deliverability
 - [ ] Test SMS delivery
-- [ ] Add unsubscribe mechanism
+- [x] Add unsubscribe mechanism
 
 ### Client Management Dashboard
 - [ ] Create /app/dashboard/clients page

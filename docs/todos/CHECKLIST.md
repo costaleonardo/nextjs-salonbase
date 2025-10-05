@@ -172,14 +172,14 @@
 - [ ] Set up webhook endpoint in Stripe dashboard
 
 ### Payment Audit Logging
-- [ ] Create audit logging utility function
-- [ ] Log payment source selection
-- [ ] Log payment attempt (method, amount, timestamp)
-- [ ] Log payment success/failure
-- [ ] Log gift certificate application
-- [ ] Log refunds and voids
-- [ ] Create audit log viewing page for admins
-- [ ] Test audit trail completeness
+- [x] Create audit logging utility function
+- [x] Log payment source selection
+- [x] Log payment attempt (method, amount, timestamp)
+- [x] Log payment success/failure
+- [x] Log gift certificate application
+- [x] Log refunds and voids
+- [x] Create audit log viewing page for admins
+- [x] Test audit trail completeness
 
 ### Receipt Generation
 - [ ] Design receipt email template

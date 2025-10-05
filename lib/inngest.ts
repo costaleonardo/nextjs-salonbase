@@ -7,10 +7,9 @@ import {
   appointmentReminderSMS,
   appointmentCancellationSMS,
   appointmentRescheduledSMS,
-  paymentReceiptSMS,
 } from "@/components/sms/templates";
-import { AppointmentConfirmation } from "@/components/emails/AppointmentConfirmation";
-import { AppointmentReminder } from "@/components/emails/AppointmentReminder";
+import AppointmentConfirmationEmail from "@/components/emails/AppointmentConfirmation";
+import AppointmentReminderEmail from "@/components/emails/AppointmentReminder";
 
 // Define event schemas for type safety
 type Events = {
@@ -98,19 +97,32 @@ export const sendAppointmentConfirmationNotification = inngest.createFunction(
     if (client.email && client.emailNotificationsEnabled) {
       await step.run("send-confirmation-email", async () => {
         try {
+          const appointmentDate = new Intl.DateTimeFormat('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+          }).format(appointment.datetime);
+
+          const appointmentTime = new Intl.DateTimeFormat('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+          }).format(appointment.datetime);
+
           await sendEmailFromComponent({
             to: client.email!,
             subject: `Appointment Confirmed - ${salon.name}`,
-            component: AppointmentConfirmation({
+            component: AppointmentConfirmationEmail({
               clientName: client.name,
               serviceName: service.name,
               staffName: staff.name,
-              dateTime: appointment.datetime,
-              duration: service.duration,
+              appointmentDate,
+              appointmentTime,
               price: service.price.toString(),
               salonName: salon.name,
               salonAddress: salon.address || "",
               salonPhone: salon.phone || "",
+              clientId: client.id,
             }),
           });
         } catch (error) {
@@ -196,19 +208,32 @@ export const sendAppointmentReminderNotification = inngest.createFunction(
     if (client.email && client.emailNotificationsEnabled) {
       await step.run("send-reminder-email", async () => {
         try {
+          const appointmentDate = new Intl.DateTimeFormat('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+          }).format(appointment.datetime);
+
+          const appointmentTime = new Intl.DateTimeFormat('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+          }).format(appointment.datetime);
+
           await sendEmailFromComponent({
             to: client.email!,
             subject: `Reminder: Your appointment tomorrow at ${salon.name}`,
-            component: AppointmentReminder({
+            component: AppointmentReminderEmail({
               clientName: client.name,
               serviceName: service.name,
               staffName: staff.name,
-              dateTime: appointment.datetime,
-              duration: service.duration,
+              appointmentDate,
+              appointmentTime,
               price: service.price.toString(),
               salonName: salon.name,
               salonAddress: salon.address || "",
               salonPhone: salon.phone || "",
+              clientId: client.id,
             }),
           });
         } catch (error) {

@@ -224,17 +224,17 @@
 - [x] Add unsubscribe mechanism
 
 ### Client Management Dashboard
-- [ ] Create /app/dashboard/clients page
-- [ ] Implement client list view with search
-- [ ] Add client filtering (by name, email, phone)
-- [ ] Create client detail view
-- [ ] Show client appointment history
-- [ ] Calculate and display total spend
-- [ ] Show client visit frequency
-- [ ] Add client notes section (staff-only)
-- [ ] Create "Add Client" form
-- [ ] Create "Edit Client" form
-- [ ] Test client search performance
+- [x] Create /app/dashboard/clients page
+- [x] Implement client list view with search
+- [x] Add client filtering (by name, email, phone)
+- [x] Create client detail view
+- [x] Show client appointment history
+- [x] Calculate and display total spend
+- [x] Show client visit frequency
+- [x] Add client notes section (staff-only)
+- [x] Create "Add Client" form
+- [x] Create "Edit Client" form
+- [x] Test client search performance
 
 ### Public Booking Widget
 - [ ] Create /app/book/[salonSlug] public route

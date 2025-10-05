@@ -45,7 +45,13 @@ export async function sendEmail({
   }
 
   try {
-    const emailBody = react ? { react } : html ? { html, text } : { text }
+    const emailBody = react
+      ? { react }
+      : html
+      ? { html, ...(text ? { text } : {}) }
+      : text
+      ? { text }
+      : { html: '' }
 
     const result = await resend.emails.send({
       from: EMAIL_FROM,

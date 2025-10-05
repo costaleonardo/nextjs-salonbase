@@ -15,7 +15,8 @@
     "db:studio": "dotenv -e .env.local -- prisma studio",
     "db:push": "dotenv -e .env.local -- prisma db push",
     "db:seed": "dotenv -e .env.local -- tsx prisma/seed.ts",
-    "test:webhooks": "npx tsx scripts/verify-webhook-setup.ts"
+    "test:webhooks": "npx tsx scripts/verify-webhook-setup.ts",
+    "test:receipts": "npx tsx scripts/test-receipt-generation.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
@@ -23,6 +24,8 @@
     "@neondatabase/serverless": "^1.0.2",
     "@prisma/adapter-neon": "^6.16.3",
     "@prisma/client": "^6.16.3",
+    "@react-email/components": "^0.5.5",
+    "@react-email/render": "^1.3.1",
     "@stripe/react-stripe-js": "^5.0.0",
     "@stripe/stripe-js": "^8.0.0",
     "bcryptjs": "^3.0.2",
@@ -32,6 +35,7 @@
     "prisma": "^6.16.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "resend": "^6.1.2",
     "stripe": "^19.1.0",
     "ws": "^8.18.3"
   },

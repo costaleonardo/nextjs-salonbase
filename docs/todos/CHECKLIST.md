@@ -108,46 +108,46 @@
 - [x] Test Stripe connection in development
 
 ### Payment Schema
-- [ ] Create PaymentMethod enum (CREDIT_CARD, GIFT_CERTIFICATE, CASH, OTHER)
-- [ ] Create PaymentStatus enum (PENDING, COMPLETED, FAILED, REFUNDED)
-- [ ] Create Payment model (id, appointmentId, amount, method, stripePaymentId, status, createdAt)
-- [ ] Add Payment to Appointment relation (one-to-one)
-- [ ] Add Payment indexes (stripePaymentId)
-- [ ] Create PaymentAuditLog model (id, paymentId, action, details JSON, createdAt)
-- [ ] Add PaymentAuditLog indexes (paymentId, createdAt)
-- [ ] Run migration: `prisma migrate dev --name add_payments`
+- [x] Create PaymentMethod enum (CREDIT_CARD, GIFT_CERTIFICATE, CASH, OTHER)
+- [x] Create PaymentStatus enum (PENDING, COMPLETED, FAILED, REFUNDED)
+- [x] Create Payment model (id, appointmentId, amount, method, stripePaymentId, status, createdAt)
+- [x] Add Payment to Appointment relation (one-to-one)
+- [x] Add Payment indexes (stripePaymentId)
+- [x] Create PaymentAuditLog model (id, paymentId, action, details JSON, createdAt)
+- [x] Add PaymentAuditLog indexes (paymentId, createdAt)
+- [x] Run migration: `prisma migrate dev --name add_payments`
 
 ### Gift Certificate System
-- [ ] Create GiftCertificate model (id, code, balance, originalAmount, salonId, clientId, createdAt, expiresAt)
-- [ ] Add GiftCertificate indexes (code, salonId)
-- [ ] Run migration: `prisma migrate dev --name add_gift_certificates`
-- [ ] Create gift certificate generation logic (unique code generator)
-- [ ] Implement gift certificate validation
-- [ ] Create checkGiftCertificateBalance server action
-- [ ] Create redeemGiftCertificate server action
-- [ ] Add gift certificate balance tracking
-- [ ] Implement expiration date handling
-- [ ] Test certificate deduplication
+- [x] Create GiftCertificate model (id, code, balance, originalAmount, salonId, clientId, createdAt, expiresAt)
+- [x] Add GiftCertificate indexes (code, salonId)
+- [x] Run migration: `prisma migrate dev --name add_gift_certificates`
+- [x] Create gift certificate generation logic (unique code generator)
+- [x] Implement gift certificate validation
+- [x] Create checkGiftCertificateBalance server action
+- [x] Create redeemGiftCertificate server action
+- [x] Add gift certificate balance tracking
+- [x] Implement expiration date handling
+- [x] Test certificate deduplication
 
 ### Payment Processing - CRITICAL IMPLEMENTATION
-- [ ] Create payment source selection component with EXPLICIT UI
-  - [ ] Radio buttons for payment source (Gift Certificate, Credit Card, Cash, Other)
-  - [ ] Show gift certificate balance prominently
-  - [ ] Show last 4 digits of saved cards
-  - [ ] Add "New Payment Method" option
-- [ ] Implement payment source hierarchy logic:
-  1. [ ] Check for available gift certificates FIRST
-  2. [ ] Show explicit payment source selection
-  3. [ ] Require confirmation for credit card charges
-  4. [ ] Log every payment decision to PaymentAuditLog
-- [ ] Create processPayment server action with audit trail
-- [ ] Implement automatic rollback on payment failures
-- [ ] Add payment retry logic (max 2 attempts)
-- [ ] Create payment confirmation modal
-- [ ] Show clear payment status (pending, success, failed)
-- [ ] Test payment failure scenarios
-- [ ] Test gift certificate application before credit card
-- [ ] **Verify gift certificates NEVER accidentally charge credit cards**
+- [x] Create payment source selection component with EXPLICIT UI
+  - [x] Radio buttons for payment source (Gift Certificate, Credit Card, Cash, Other)
+  - [x] Show gift certificate balance prominently
+  - [x] Show last 4 digits of saved cards
+  - [x] Add "New Payment Method" option
+- [x] Implement payment source hierarchy logic:
+  1. [x] Check for available gift certificates FIRST
+  2. [x] Show explicit payment source selection
+  3. [x] Require confirmation for credit card charges
+  4. [x] Log every payment decision to PaymentAuditLog
+- [x] Create processPayment server action with audit trail
+- [x] Implement automatic rollback on payment failures
+- [x] Add payment retry logic (max 2 attempts)
+- [x] Create payment confirmation modal
+- [x] Show clear payment status (pending, success, failed)
+- [x] Test payment failure scenarios
+- [x] Test gift certificate application before credit card
+- [x] **Verify gift certificates NEVER accidentally charge credit cards**
 
 ### Stripe Payment Flow
 - [ ] Create Stripe Payment Intent creation endpoint

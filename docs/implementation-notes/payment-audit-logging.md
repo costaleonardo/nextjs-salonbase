@@ -15,14 +15,11 @@ This document details the implementation of the Payment Audit Logging system, wh
 **Location:** [app/actions/payments.ts:30-47](../app/actions/payments.ts)
 
 ```typescript
-async function logPaymentAudit(
-  paymentId: string,
-  action: string,
-  details: Record<string, any>
-)
+async function logPaymentAudit(paymentId: string, action: string, details: Record<string, any>);
 ```
 
 **Features:**
+
 - Asynchronous logging that never blocks payment processing
 - Graceful error handling (logs errors to console but doesn't fail payments)
 - Stores structured data in JSON format
@@ -34,6 +31,7 @@ async function logPaymentAudit(
 **Location:** [app/actions/payments.ts:118-125](../app/actions/payments.ts)
 
 **Details Captured:**
+
 - Payment source type (GIFT_CERTIFICATE, CREDIT_CARD, CASH, OTHER)
 - Payment amount
 - Appointment ID
@@ -44,11 +42,13 @@ async function logPaymentAudit(
 ### 3. Payment Attempt Logging ✅
 
 **Actions:**
+
 - `gift_certificate_payment_attempt` (line 240)
 - `credit_card_payment_attempt` (line 289)
 - `manual_payment_processed` (line 361)
 
 **Details Captured:**
+
 - Payment method
 - Amount being charged
 - Amount in cents (for Stripe)
@@ -58,17 +58,20 @@ async function logPaymentAudit(
 ### 4. Payment Success/Failure Logging ✅
 
 **Success Actions:**
+
 - `payment_succeeded` (line 187)
 - `gift_certificate_payment_succeeded` (line 261)
 - `credit_card_payment_succeeded` (line 333)
 
 **Failure Actions:**
+
 - `payment_rolled_back` (line 391)
 - `gift_certificate_payment_failed` (line 253)
 - `credit_card_payment_failed` (line 345)
 - `rollback_failed` (line 398)
 
 **Details Captured:**
+
 - Success: Amount, method, Stripe Payment ID, amount applied
 - Failure: Error message, reason for rollback
 - Rollback: Original error and rollback error (if rollback fails)
@@ -76,11 +79,13 @@ async function logPaymentAudit(
 ### 5. Gift Certificate Application Logging ✅
 
 **Actions:**
+
 - `gift_certificate_payment_attempt` (line 240)
 - `gift_certificate_payment_succeeded` (line 261)
 - `gift_certificate_payment_failed` (line 253)
 
 **Details Captured:**
+
 - Gift certificate code
 - Amount to redeem
 - Amount actually applied
@@ -92,11 +97,13 @@ async function logPaymentAudit(
 **Location:** [app/actions/payments.ts:601-675](../app/actions/payments.ts)
 
 **Actions:**
+
 - `refund_initiated` (line 631)
 - `stripe_refund_created` (line 645)
 - `refund_completed` (line 666)
 
 **Details Captured:**
+
 - Who initiated the refund (email)
 - Reason for refund
 - Stripe refund ID
@@ -104,6 +111,7 @@ async function logPaymentAudit(
 - Timestamp
 
 **Access Control:**
+
 - Only OWNER role can process refunds
 - Verified at line 609
 
@@ -112,6 +120,7 @@ async function logPaymentAudit(
 **Location:** [app/dashboard/payments/audit/page.tsx](../app/dashboard/payments/audit/page.tsx)
 
 **Features:**
+
 - **Access Control:** Only OWNER role can view (redirects STAFF to dashboard)
 - **Filtering:** Filter by specific payment ID via query parameter
 - **Recent Logs:** Shows last 100 audit log entries by default
@@ -121,6 +130,7 @@ async function logPaymentAudit(
 **Client Component:** [app/dashboard/payments/audit/AuditLogTable.tsx](../app/dashboard/payments/audit/AuditLogTable.tsx)
 
 **UI Features:**
+
 - Payment filter dropdown
 - Color-coded action badges (success=green, failure=red, pending=yellow)
 - Expandable rows to view full JSON details
@@ -136,6 +146,7 @@ async function logPaymentAudit(
 **Location:** [scripts/test-audit-trail.ts](../scripts/test-audit-trail.ts)
 
 **Test Scenarios:**
+
 1. ✅ All payments have audit logs (no orphaned payments)
 2. ✅ Completed payments have required events (`source_selected`, `payment_succeeded`)
 3. ✅ Failed payments have rollback logs
@@ -144,6 +155,7 @@ async function logPaymentAudit(
 6. ✅ Audit logs are chronologically ordered
 
 **How to Run:**
+
 ```bash
 npx dotenv -e .env.local -- npx tsx scripts/test-audit-trail.ts
 ```
@@ -153,6 +165,7 @@ npx dotenv -e .env.local -- npx tsx scripts/test-audit-trail.ts
 ## Database Schema
 
 **PaymentAuditLog Model:**
+
 ```prisma
 model PaymentAuditLog {
   id        String   @id @default(cuid())
@@ -169,6 +182,7 @@ model PaymentAuditLog {
 ```
 
 **Indexes:**
+
 - `paymentId` - Fast lookup of all logs for a specific payment
 - `createdAt` - Time-based queries and ordering
 - `action` - Filter by specific action types
@@ -176,6 +190,7 @@ model PaymentAuditLog {
 ## Complete List of Audit Actions
 
 ### Payment Flow
+
 1. `source_selected` - User selects payment source
 2. `gift_certificate_payment_attempt` - Attempting to use gift certificate
 3. `gift_certificate_payment_succeeded` - Gift certificate successfully applied
@@ -190,10 +205,12 @@ model PaymentAuditLog {
 12. `rollback_failed` - Rollback itself failed (critical error)
 
 ### Stripe Elements Flow
+
 13. `payment_confirmed_via_stripe_elements` - Updated existing payment
 14. `payment_created_from_stripe_elements` - Created new payment
 
 ### Refund Flow
+
 15. `refund_initiated` - Refund process started
 16. `stripe_refund_created` - Stripe refund created
 17. `refund_completed` - Refund successfully processed
@@ -201,6 +218,7 @@ model PaymentAuditLog {
 ## Access Points
 
 ### For Salon Owners (OWNER Role)
+
 - **Payments Dashboard:** [/dashboard/payments](../app/dashboard/payments/page.tsx)
   - View all payments with stats
   - Filter by status (COMPLETED, PENDING, FAILED, REFUNDED)
@@ -213,6 +231,7 @@ model PaymentAuditLog {
   - Summary statistics
 
 ### For Developers
+
 - **Server Actions:** [app/actions/payments.ts](../app/actions/payments.ts)
   - `processPayment()` - Main payment processing with full audit trail
   - `getPaymentAuditLog(paymentId)` - Retrieve audit logs for a payment

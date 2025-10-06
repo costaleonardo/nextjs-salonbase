@@ -5,6 +5,7 @@ This guide explains how to set up and use the notification system in SalonBase.
 ## Overview
 
 The notification system automatically sends email and SMS notifications for:
+
 - **Appointment Confirmations** - Sent immediately when an appointment is created
 - **Appointment Reminders** - Sent 24 hours before the appointment
 - **Appointment Cancellations** - Sent immediately when an appointment is cancelled
@@ -13,6 +14,7 @@ The notification system automatically sends email and SMS notifications for:
 ## Architecture
 
 The system uses:
+
 - **Inngest** - Event-driven background job queue
 - **Resend** - Email delivery service
 - **Twilio** - SMS delivery service
@@ -36,6 +38,7 @@ Inngest is required to queue and process notification jobs.
 ### 2. Register Inngest Functions
 
 1. Start your development server:
+
    ```bash
    npm run dev
    ```
@@ -94,6 +97,7 @@ npx tsx scripts/test-notification-system.ts
 ```
 
 This will:
+
 1. Find a test appointment
 2. Check notification preferences
 3. Schedule a confirmation notification
@@ -110,15 +114,15 @@ When an appointment is created, updated, or cancelled, notifications are automat
 // In app/actions/appointments.ts
 
 // After creating an appointment
-await scheduleAppointmentConfirmation(appointment.id)
-await scheduleAppointmentReminder(appointment.id, appointment.datetime)
+await scheduleAppointmentConfirmation(appointment.id);
+await scheduleAppointmentReminder(appointment.id, appointment.datetime);
 
 // After cancelling an appointment
-await sendAppointmentCancellation(appointmentId)
-await cancelPendingReminder(appointmentId)
+await sendAppointmentCancellation(appointmentId);
+await cancelPendingReminder(appointmentId);
 
 // After rescheduling an appointment
-await sendAppointmentRescheduled(appointmentId, oldDateTime, newDateTime)
+await sendAppointmentRescheduled(appointmentId, oldDateTime, newDateTime);
 ```
 
 ### Notification Flow
@@ -137,6 +141,7 @@ Clients can unsubscribe from notifications:
 - **SMS Unsubscribe**: Handled automatically by Twilio (STOP keyword)
 
 Preferences are stored in the `Client` model:
+
 - `emailNotificationsEnabled` (default: true)
 - `smsNotificationsEnabled` (default: true)
 
@@ -145,6 +150,7 @@ Notifications will respect these preferences before sending.
 ### Unsubscribe URLs
 
 Email templates include unsubscribe links:
+
 ```
 /api/unsubscribe?clientId={id}&type=email
 /api/unsubscribe?clientId={id}&type=sms
@@ -194,12 +200,13 @@ const notifications = await db.notification.findMany({
     },
   },
   orderBy: { createdAt: "desc" },
-})
+});
 ```
 
 ### Inngest Dashboard
 
 Monitor notification jobs in the Inngest dashboard:
+
 - View event history
 - Check function runs
 - Debug failures
@@ -230,13 +237,15 @@ Monitor notification jobs in the Inngest dashboard:
 Test email rendering:
 
 ```typescript
-import { renderEmailToHtml } from "@/lib/email"
-import { AppointmentConfirmation } from "@/components/emails/AppointmentConfirmation"
+import { renderEmailToHtml } from "@/lib/email";
+import { AppointmentConfirmation } from "@/components/emails/AppointmentConfirmation";
 
 const html = await renderEmailToHtml(
-  AppointmentConfirmation({ /* props */ })
-)
-console.log(html)
+  AppointmentConfirmation({
+    /* props */
+  })
+);
+console.log(html);
 ```
 
 ### SMS Issues
@@ -277,6 +286,7 @@ console.log(html)
 ## Support
 
 For issues with:
+
 - **Inngest** - [inngest.com/docs](https://www.inngest.com/docs)
 - **Resend** - [resend.com/docs](https://resend.com/docs)
 - **Twilio** - [twilio.com/docs](https://www.twilio.com/docs)

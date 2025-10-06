@@ -1,50 +1,48 @@
-'use server'
+"use server";
 
-import { auth } from "@/lib/auth"
-import { db } from "@/lib/db"
-import { AppointmentStatus, Role } from "@prisma/client"
-import { revalidatePath } from "next/cache"
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { AppointmentStatus, Role } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 import {
   scheduleAppointmentConfirmation,
   scheduleAppointmentReminder,
   sendAppointmentCancellation,
   sendAppointmentRescheduled,
   cancelPendingReminder,
-} from "@/lib/notifications"
+} from "@/lib/notifications";
 
 // ============================================
 // Types
 // ============================================
 
 export type AppointmentInput = {
-  clientId: string
-  staffId: string
-  serviceId: string
-  datetime: Date | string
-  notes?: string
-}
+  clientId: string;
+  staffId: string;
+  serviceId: string;
+  datetime: Date | string;
+  notes?: string;
+};
 
 export type AppointmentUpdateInput = {
-  id: string
-  clientId?: string
-  staffId?: string
-  serviceId?: string
-  datetime?: Date | string
-  status?: AppointmentStatus
-  notes?: string
-}
+  id: string;
+  clientId?: string;
+  staffId?: string;
+  serviceId?: string;
+  datetime?: Date | string;
+  status?: AppointmentStatus;
+  notes?: string;
+};
 
 export type AppointmentFilterInput = {
-  startDate?: Date | string
-  endDate?: Date | string
-  staffId?: string
-  clientId?: string
-  status?: AppointmentStatus
-}
+  startDate?: Date | string;
+  endDate?: Date | string;
+  staffId?: string;
+  clientId?: string;
+  status?: AppointmentStatus;
+};
 
-type ActionResult<T> =
-  | { success: true; data: T }
-  | { success: false; error: string }
+type ActionResult<T> = { success: true; data: T } | { success: false; error: string };
 
 // ============================================
 // Validation & Conflict Detection
@@ -59,9 +57,9 @@ async function checkConflicts(
   datetime: Date,
   serviceDuration: number,
   excludeAppointmentId?: string
-): Promise<{ type: 'appointment' | 'blocked'; details: string } | null> {
-  const appointmentStart = new Date(datetime)
-  const appointmentEnd = new Date(appointmentStart.getTime() + serviceDuration * 60000)
+): Promise<{ type: "appointment" | "blocked"; details: string } | null> {
+  const appointmentStart = new Date(datetime);
+  const appointmentEnd = new Date(appointmentStart.getTime() + serviceDuration * 60000);
 
   // Check for overlapping appointments
   const existingAppointments = await db.appointment.findMany({
@@ -76,11 +74,11 @@ async function checkConflicts(
       service: true,
       client: true,
     },
-  })
+  });
 
   for (const appointment of existingAppointments) {
-    const existingStart = new Date(appointment.datetime)
-    const existingEnd = new Date(existingStart.getTime() + appointment.service.duration * 60000)
+    const existingStart = new Date(appointment.datetime);
+    const existingEnd = new Date(existingStart.getTime() + appointment.service.duration * 60000);
 
     // Check if time slots overlap
     if (
@@ -89,9 +87,9 @@ async function checkConflicts(
       (appointmentStart <= existingStart && appointmentEnd >= existingEnd)
     ) {
       return {
-        type: 'appointment',
+        type: "appointment",
         details: `Conflicts with existing appointment for ${appointment.client.name} at ${existingStart.toLocaleTimeString()}`,
-      }
+      };
     }
   }
 
@@ -102,38 +100,29 @@ async function checkConflicts(
       OR: [
         {
           // Check if appointment starts during blocked time
-          AND: [
-            { startTime: { lte: appointmentStart } },
-            { endTime: { gt: appointmentStart } },
-          ],
+          AND: [{ startTime: { lte: appointmentStart } }, { endTime: { gt: appointmentStart } }],
         },
         {
           // Check if appointment ends during blocked time
-          AND: [
-            { startTime: { lt: appointmentEnd } },
-            { endTime: { gte: appointmentEnd } },
-          ],
+          AND: [{ startTime: { lt: appointmentEnd } }, { endTime: { gte: appointmentEnd } }],
         },
         {
           // Check if appointment completely encompasses blocked time
-          AND: [
-            { startTime: { gte: appointmentStart } },
-            { endTime: { lte: appointmentEnd } },
-          ],
+          AND: [{ startTime: { gte: appointmentStart } }, { endTime: { lte: appointmentEnd } }],
         },
       ],
     },
-  })
+  });
 
   if (blockedTimes.length > 0) {
-    const blockedTime = blockedTimes[0]
+    const blockedTime = blockedTimes[0];
     return {
-      type: 'blocked',
-      details: `Staff is unavailable: ${blockedTime.reason || 'Blocked time'}`,
-    }
+      type: "blocked",
+      details: `Staff is unavailable: ${blockedTime.reason || "Blocked time"}`,
+    };
   }
 
-  return null
+  return null;
 }
 
 /**
@@ -143,11 +132,11 @@ async function validateAppointmentInput(
   input: AppointmentInput,
   salonId: string
 ): Promise<{ valid: true } | { valid: false; error: string }> {
-  const datetime = new Date(input.datetime)
+  const datetime = new Date(input.datetime);
 
   // Check if datetime is in the past
   if (datetime < new Date()) {
-    return { valid: false, error: 'Appointment time cannot be in the past' }
+    return { valid: false, error: "Appointment time cannot be in the past" };
   }
 
   // Verify client exists and belongs to salon
@@ -156,10 +145,10 @@ async function validateAppointmentInput(
       id: input.clientId,
       salonId,
     },
-  })
+  });
 
   if (!client) {
-    return { valid: false, error: 'Client not found' }
+    return { valid: false, error: "Client not found" };
   }
 
   // Verify staff exists and belongs to salon
@@ -169,10 +158,10 @@ async function validateAppointmentInput(
       salonId,
       role: { in: [Role.OWNER, Role.STAFF] },
     },
-  })
+  });
 
   if (!staff) {
-    return { valid: false, error: 'Staff member not found' }
+    return { valid: false, error: "Staff member not found" };
   }
 
   // Verify service exists and belongs to salon
@@ -182,18 +171,18 @@ async function validateAppointmentInput(
       salonId,
       isActive: true,
     },
-  })
+  });
 
   if (!service) {
-    return { valid: false, error: 'Service not found or inactive' }
+    return { valid: false, error: "Service not found or inactive" };
   }
 
   // Verify staff can perform this service (if staffIds are specified)
   if (service.staffIds.length > 0 && !service.staffIds.includes(input.staffId)) {
-    return { valid: false, error: 'Staff member cannot perform this service' }
+    return { valid: false, error: "Staff member cannot perform this service" };
   }
 
-  return { valid: true }
+  return { valid: true };
 }
 
 // ============================================
@@ -208,34 +197,34 @@ export async function createAppointment(
 ): Promise<ActionResult<{ id: string; conflict?: { type: string; details: string } }>> {
   try {
     // 1. Validate user session
-    const session = await auth()
+    const session = await auth();
     if (!session?.user) {
-      return { success: false, error: 'Unauthorized' }
+      return { success: false, error: "Unauthorized" };
     }
 
     // 2. Check permissions (OWNER and STAFF can create appointments)
     if (session.user.role === Role.CLIENT) {
-      return { success: false, error: 'Insufficient permissions' }
+      return { success: false, error: "Insufficient permissions" };
     }
 
     // 3. Validate salonId
     if (!session.user.salonId) {
-      return { success: false, error: 'No salon associated with user' }
+      return { success: false, error: "No salon associated with user" };
     }
 
     // 4. Validate input
-    const validation = await validateAppointmentInput(input, session.user.salonId)
+    const validation = await validateAppointmentInput(input, session.user.salonId);
     if (!validation.valid) {
-      return { success: false, error: validation.error }
+      return { success: false, error: validation.error };
     }
 
     // 5. Get service to check duration for conflict detection
     const service = await db.service.findUnique({
       where: { id: input.serviceId },
-    })
+    });
 
     if (!service) {
-      return { success: false, error: 'Service not found' }
+      return { success: false, error: "Service not found" };
     }
 
     // 6. Check for conflicts
@@ -243,13 +232,13 @@ export async function createAppointment(
       input.staffId,
       new Date(input.datetime),
       service.duration
-    )
+    );
 
     if (conflict) {
       return {
         success: false,
         error: conflict.details,
-      }
+      };
     }
 
     // 7. Create appointment
@@ -263,24 +252,24 @@ export async function createAppointment(
         notes: input.notes,
         status: AppointmentStatus.SCHEDULED,
       },
-    })
+    });
 
     // 8. Schedule notifications (non-blocking)
     try {
-      await scheduleAppointmentConfirmation(appointment.id)
-      await scheduleAppointmentReminder(appointment.id, appointment.datetime)
+      await scheduleAppointmentConfirmation(appointment.id);
+      await scheduleAppointmentReminder(appointment.id, appointment.datetime);
     } catch (error) {
-      console.error('Failed to schedule notifications:', error)
+      console.error("Failed to schedule notifications:", error);
       // Don't fail the appointment creation if notifications fail
     }
 
     // 9. Revalidate appointments page
-    revalidatePath('/dashboard/appointments')
+    revalidatePath("/dashboard/appointments");
 
-    return { success: true, data: { id: appointment.id } }
+    return { success: true, data: { id: appointment.id } };
   } catch (error) {
-    console.error('Error creating appointment:', error)
-    return { success: false, error: 'Failed to create appointment' }
+    console.error("Error creating appointment:", error);
+    return { success: false, error: "Failed to create appointment" };
   }
 }
 
@@ -292,19 +281,19 @@ export async function updateAppointment(
 ): Promise<ActionResult<{ id: string }>> {
   try {
     // 1. Validate user session
-    const session = await auth()
+    const session = await auth();
     if (!session?.user) {
-      return { success: false, error: 'Unauthorized' }
+      return { success: false, error: "Unauthorized" };
     }
 
     // 2. Check permissions
     if (session.user.role === Role.CLIENT) {
-      return { success: false, error: 'Insufficient permissions' }
+      return { success: false, error: "Insufficient permissions" };
     }
 
     // 3. Validate salonId
     if (!session.user.salonId) {
-      return { success: false, error: 'No salon associated with user' }
+      return { success: false, error: "No salon associated with user" };
     }
 
     // 4. Verify appointment exists and belongs to salon
@@ -316,43 +305,40 @@ export async function updateAppointment(
       include: {
         service: true,
       },
-    })
+    });
 
     if (!existingAppointment) {
-      return { success: false, error: 'Appointment not found' }
+      return { success: false, error: "Appointment not found" };
     }
 
     // 5. If updating datetime or staffId, check for conflicts
     if (input.datetime || input.staffId || input.serviceId) {
-      const staffId = input.staffId || existingAppointment.staffId
-      const datetime = input.datetime ? new Date(input.datetime) : existingAppointment.datetime
+      const staffId = input.staffId || existingAppointment.staffId;
+      const datetime = input.datetime ? new Date(input.datetime) : existingAppointment.datetime;
 
       // Get service duration (either new service or existing)
-      let serviceDuration = existingAppointment.service.duration
+      let serviceDuration = existingAppointment.service.duration;
       if (input.serviceId && input.serviceId !== existingAppointment.serviceId) {
         const newService = await db.service.findUnique({
           where: { id: input.serviceId },
-        })
+        });
         if (!newService) {
-          return { success: false, error: 'Service not found' }
+          return { success: false, error: "Service not found" };
         }
-        serviceDuration = newService.duration
+        serviceDuration = newService.duration;
       }
 
-      const conflict = await checkConflicts(
-        staffId,
-        datetime,
-        serviceDuration,
-        input.id
-      )
+      const conflict = await checkConflicts(staffId, datetime, serviceDuration, input.id);
 
       if (conflict) {
-        return { success: false, error: conflict.details }
+        return { success: false, error: conflict.details };
       }
     }
 
     // 6. Check if datetime is being updated (rescheduling)
-    const isRescheduling = input.datetime && new Date(input.datetime).getTime() !== existingAppointment.datetime.getTime()
+    const isRescheduling =
+      input.datetime &&
+      new Date(input.datetime).getTime() !== existingAppointment.datetime.getTime();
 
     // 7. Update appointment
     const updatedAppointment = await db.appointment.update({
@@ -365,7 +351,7 @@ export async function updateAppointment(
         ...(input.status && { status: input.status }),
         ...(input.notes !== undefined && { notes: input.notes }),
       },
-    })
+    });
 
     // 8. Send rescheduling notification if datetime changed (non-blocking)
     if (isRescheduling) {
@@ -374,20 +360,20 @@ export async function updateAppointment(
           updatedAppointment.id,
           existingAppointment.datetime,
           updatedAppointment.datetime
-        )
+        );
       } catch (error) {
-        console.error('Failed to send rescheduling notification:', error)
+        console.error("Failed to send rescheduling notification:", error);
         // Don't fail the update if notification fails
       }
     }
 
     // 9. Revalidate appointments page
-    revalidatePath('/dashboard/appointments')
+    revalidatePath("/dashboard/appointments");
 
-    return { success: true, data: { id: updatedAppointment.id } }
+    return { success: true, data: { id: updatedAppointment.id } };
   } catch (error) {
-    console.error('Error updating appointment:', error)
-    return { success: false, error: 'Failed to update appointment' }
+    console.error("Error updating appointment:", error);
+    return { success: false, error: "Failed to update appointment" };
   }
 }
 
@@ -399,19 +385,19 @@ export async function cancelAppointment(
 ): Promise<ActionResult<{ id: string }>> {
   try {
     // 1. Validate user session
-    const session = await auth()
+    const session = await auth();
     if (!session?.user) {
-      return { success: false, error: 'Unauthorized' }
+      return { success: false, error: "Unauthorized" };
     }
 
     // 2. Check permissions
     if (session.user.role === Role.CLIENT) {
-      return { success: false, error: 'Insufficient permissions' }
+      return { success: false, error: "Insufficient permissions" };
     }
 
     // 3. Validate salonId
     if (!session.user.salonId) {
-      return { success: false, error: 'No salon associated with user' }
+      return { success: false, error: "No salon associated with user" };
     }
 
     // 4. Verify appointment exists and belongs to salon
@@ -420,10 +406,10 @@ export async function cancelAppointment(
         id: appointmentId,
         salonId: session.user.salonId,
       },
-    })
+    });
 
     if (!appointment) {
-      return { success: false, error: 'Appointment not found' }
+      return { success: false, error: "Appointment not found" };
     }
 
     // 5. Update appointment status to CANCELLED
@@ -432,24 +418,24 @@ export async function cancelAppointment(
       data: {
         status: AppointmentStatus.CANCELLED,
       },
-    })
+    });
 
     // 6. Send cancellation notification and cancel pending reminders (non-blocking)
     try {
-      await sendAppointmentCancellation(appointmentId)
-      await cancelPendingReminder(appointmentId)
+      await sendAppointmentCancellation(appointmentId);
+      await cancelPendingReminder(appointmentId);
     } catch (error) {
-      console.error('Failed to send cancellation notification:', error)
+      console.error("Failed to send cancellation notification:", error);
       // Don't fail the cancellation if notification fails
     }
 
     // 7. Revalidate appointments page
-    revalidatePath('/dashboard/appointments')
+    revalidatePath("/dashboard/appointments");
 
-    return { success: true, data: { id: updatedAppointment.id } }
+    return { success: true, data: { id: updatedAppointment.id } };
   } catch (error) {
-    console.error('Error cancelling appointment:', error)
-    return { success: false, error: 'Failed to cancel appointment' }
+    console.error("Error cancelling appointment:", error);
+    return { success: false, error: "Failed to cancel appointment" };
   }
 }
 
@@ -461,46 +447,46 @@ export async function getAppointments(
 ): Promise<ActionResult<Array<any>>> {
   try {
     // 1. Validate user session
-    const session = await auth()
+    const session = await auth();
     if (!session?.user) {
-      return { success: false, error: 'Unauthorized' }
+      return { success: false, error: "Unauthorized" };
     }
 
     // 2. Check permissions
     if (session.user.role === Role.CLIENT) {
-      return { success: false, error: 'Insufficient permissions' }
+      return { success: false, error: "Insufficient permissions" };
     }
 
     // 3. Validate salonId
     if (!session.user.salonId) {
-      return { success: false, error: 'No salon associated with user' }
+      return { success: false, error: "No salon associated with user" };
     }
 
     // 4. Build query
     const where: any = {
       salonId: session.user.salonId,
-    }
+    };
 
     if (filter?.startDate || filter?.endDate) {
-      where.datetime = {}
+      where.datetime = {};
       if (filter.startDate) {
-        where.datetime.gte = new Date(filter.startDate)
+        where.datetime.gte = new Date(filter.startDate);
       }
       if (filter.endDate) {
-        where.datetime.lte = new Date(filter.endDate)
+        where.datetime.lte = new Date(filter.endDate);
       }
     }
 
     if (filter?.staffId) {
-      where.staffId = filter.staffId
+      where.staffId = filter.staffId;
     }
 
     if (filter?.clientId) {
-      where.clientId = filter.clientId
+      where.clientId = filter.clientId;
     }
 
     if (filter?.status) {
-      where.status = filter.status
+      where.status = filter.status;
     }
 
     // 5. Fetch appointments
@@ -532,14 +518,14 @@ export async function getAppointments(
         },
       },
       orderBy: {
-        datetime: 'asc',
+        datetime: "asc",
       },
-    })
+    });
 
-    return { success: true, data: appointments }
+    return { success: true, data: appointments };
   } catch (error) {
-    console.error('Error fetching appointments:', error)
-    return { success: false, error: 'Failed to fetch appointments' }
+    console.error("Error fetching appointments:", error);
+    return { success: false, error: "Failed to fetch appointments" };
   }
 }
 
@@ -555,23 +541,23 @@ export async function checkAppointmentConflicts(
 ): Promise<ActionResult<{ hasConflict: boolean; conflict?: { type: string; details: string } }>> {
   try {
     // 1. Validate user session
-    const session = await auth()
+    const session = await auth();
     if (!session?.user) {
-      return { success: false, error: 'Unauthorized' }
+      return { success: false, error: "Unauthorized" };
     }
 
     // 2. Check permissions
     if (session.user.role === Role.CLIENT) {
-      return { success: false, error: 'Insufficient permissions' }
+      return { success: false, error: "Insufficient permissions" };
     }
 
     // 3. Get service to check duration
     const service = await db.service.findUnique({
       where: { id: serviceId },
-    })
+    });
 
     if (!service) {
-      return { success: false, error: 'Service not found' }
+      return { success: false, error: "Service not found" };
     }
 
     // 4. Check for conflicts
@@ -580,7 +566,7 @@ export async function checkAppointmentConflicts(
       new Date(datetime),
       service.duration,
       excludeAppointmentId
-    )
+    );
 
     return {
       success: true,
@@ -588,10 +574,10 @@ export async function checkAppointmentConflicts(
         hasConflict: conflict !== null,
         conflict: conflict || undefined,
       },
-    }
+    };
   } catch (error) {
-    console.error('Error checking conflicts:', error)
-    return { success: false, error: 'Failed to check conflicts' }
+    console.error("Error checking conflicts:", error);
+    return { success: false, error: "Failed to check conflicts" };
   }
 }
 
@@ -606,49 +592,45 @@ export async function getStaffAvailability(
 ): Promise<ActionResult<Array<{ time: string; available: boolean }>>> {
   try {
     // 1. Validate user session
-    const session = await auth()
+    const session = await auth();
     if (!session?.user) {
-      return { success: false, error: 'Unauthorized' }
+      return { success: false, error: "Unauthorized" };
     }
 
     // 2. Get service duration
     const service = await db.service.findUnique({
       where: { id: serviceId },
-    })
+    });
 
     if (!service) {
-      return { success: false, error: 'Service not found' }
+      return { success: false, error: "Service not found" };
     }
 
     // 3. Generate time slots for the day (8 AM to 8 PM, 30-minute intervals)
-    const targetDate = new Date(date)
-    const startHour = 8
-    const endHour = 20
-    const intervalMinutes = 30
-    const slots: Array<{ time: string; available: boolean }> = []
+    const targetDate = new Date(date);
+    const startHour = 8;
+    const endHour = 20;
+    const intervalMinutes = 30;
+    const slots: Array<{ time: string; available: boolean }> = [];
 
     for (let hour = startHour; hour < endHour; hour++) {
       for (let minute = 0; minute < 60; minute += intervalMinutes) {
-        const slotTime = new Date(targetDate)
-        slotTime.setHours(hour, minute, 0, 0)
+        const slotTime = new Date(targetDate);
+        slotTime.setHours(hour, minute, 0, 0);
 
         // Check if this slot has conflicts
-        const conflict = await checkConflicts(
-          staffId,
-          slotTime,
-          service.duration
-        )
+        const conflict = await checkConflicts(staffId, slotTime, service.duration);
 
         slots.push({
           time: slotTime.toISOString(),
           available: conflict === null,
-        })
+        });
       }
     }
 
-    return { success: true, data: slots }
+    return { success: true, data: slots };
   } catch (error) {
-    console.error('Error getting staff availability:', error)
-    return { success: false, error: 'Failed to get staff availability' }
+    console.error("Error getting staff availability:", error);
+    return { success: false, error: "Failed to get staff availability" };
   }
 }

@@ -1,73 +1,73 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { createPublicBooking } from '@/app/actions/public-bookings'
+import { useState } from "react";
+import { createPublicBooking } from "@/app/actions/public-bookings";
 
 type BookingData = {
-  serviceId?: string
-  staffId?: string
-  datetime?: string
-  clientName?: string
-  clientEmail?: string
-  clientPhone?: string
-  notes?: string
-}
+  serviceId?: string;
+  staffId?: string;
+  datetime?: string;
+  clientName?: string;
+  clientEmail?: string;
+  clientPhone?: string;
+  notes?: string;
+};
 
 type ClientFormProps = {
-  salonId: string
-  bookingData: BookingData
-  onSubmit: (appointmentId: string) => void
-  onBack: () => void
-}
+  salonId: string;
+  bookingData: BookingData;
+  onSubmit: (appointmentId: string) => void;
+  onBack: () => void;
+};
 
 export function ClientForm({ salonId, bookingData, onSubmit, onBack }: ClientFormProps) {
   const [formData, setFormData] = useState({
-    name: bookingData.clientName || '',
-    email: bookingData.clientEmail || '',
-    phone: bookingData.clientPhone || '',
-    notes: bookingData.notes || '',
-  })
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitError, setSubmitError] = useState<string | null>(null)
+    name: bookingData.clientName || "",
+    email: bookingData.clientEmail || "",
+    phone: bookingData.clientPhone || "",
+    notes: bookingData.notes || "",
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {}
+    const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required'
+      newErrors.name = "Name is required";
     }
 
     if (!formData.email.trim() && !formData.phone.trim()) {
-      newErrors.contact = 'Please provide either email or phone number'
+      newErrors.contact = "Please provide either email or phone number";
     }
 
     if (formData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address'
+      newErrors.email = "Please enter a valid email address";
     }
 
     if (formData.phone.trim() && !/^\+?[\d\s\-()]+$/.test(formData.phone)) {
-      newErrors.phone = 'Please enter a valid phone number'
+      newErrors.phone = "Please enter a valid phone number";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitError(null)
+    e.preventDefault();
+    setSubmitError(null);
 
     if (!validateForm()) {
-      return
+      return;
     }
 
     if (!bookingData.serviceId || !bookingData.staffId || !bookingData.datetime) {
-      setSubmitError('Missing booking information. Please start over.')
-      return
+      setSubmitError("Missing booking information. Please start over.");
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     const result = await createPublicBooking({
       salonId,
@@ -78,24 +78,24 @@ export function ClientForm({ salonId, bookingData, onSubmit, onBack }: ClientFor
       clientEmail: formData.email || undefined,
       clientPhone: formData.phone || undefined,
       notes: formData.notes || undefined,
-    })
+    });
 
     if (result.success) {
-      onSubmit(result.data.appointmentId)
+      onSubmit(result.data.appointmentId);
     } else {
-      setSubmitError(result.error)
-      setIsSubmitting(false)
+      setSubmitError(result.error);
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-semibold text-gray-900">Your Information</h2>
         <button
           onClick={onBack}
-          className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-          style={{ minHeight: '44px', minWidth: '44px' }}
+          className="text-sm font-medium text-blue-600 hover:text-blue-700"
+          style={{ minHeight: "44px", minWidth: "44px" }}
           disabled={isSubmitting}
         >
           ← Back
@@ -105,7 +105,7 @@ export function ClientForm({ salonId, bookingData, onSubmit, onBack }: ClientFor
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Name */}
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
             Full Name <span className="text-red-500">*</span>
           </label>
           <input
@@ -113,20 +113,20 @@ export function ClientForm({ salonId, bookingData, onSubmit, onBack }: ClientFor
             type="text"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className={`w-full px-4 py-3 rounded-lg border ${
-              errors.name ? 'border-red-300' : 'border-gray-300'
-            } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            className={`w-full rounded-lg border px-4 py-3 ${
+              errors.name ? "border-red-300" : "border-gray-300"
+            } focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none`}
             placeholder="John Doe"
             autoComplete="name"
             disabled={isSubmitting}
-            style={{ minHeight: '44px' }}
+            style={{ minHeight: "44px" }}
           />
-          {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name}</p>}
+          {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
         </div>
 
         {/* Email */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
             Email {!formData.phone && <span className="text-red-500">*</span>}
           </label>
           <input
@@ -134,20 +134,20 @@ export function ClientForm({ salonId, bookingData, onSubmit, onBack }: ClientFor
             type="email"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className={`w-full px-4 py-3 rounded-lg border ${
-              errors.email ? 'border-red-300' : 'border-gray-300'
-            } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            className={`w-full rounded-lg border px-4 py-3 ${
+              errors.email ? "border-red-300" : "border-gray-300"
+            } focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none`}
             placeholder="john@example.com"
             autoComplete="email"
             disabled={isSubmitting}
-            style={{ minHeight: '44px' }}
+            style={{ minHeight: "44px" }}
           />
-          {errors.email && <p className="text-sm text-red-600 mt-1">{errors.email}</p>}
+          {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
         </div>
 
         {/* Phone */}
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="phone" className="mb-1 block text-sm font-medium text-gray-700">
             Phone Number {!formData.email && <span className="text-red-500">*</span>}
           </label>
           <input
@@ -155,15 +155,15 @@ export function ClientForm({ salonId, bookingData, onSubmit, onBack }: ClientFor
             type="tel"
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            className={`w-full px-4 py-3 rounded-lg border ${
-              errors.phone ? 'border-red-300' : 'border-gray-300'
-            } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            className={`w-full rounded-lg border px-4 py-3 ${
+              errors.phone ? "border-red-300" : "border-gray-300"
+            } focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none`}
             placeholder="(555) 123-4567"
             autoComplete="tel"
             disabled={isSubmitting}
-            style={{ minHeight: '44px' }}
+            style={{ minHeight: "44px" }}
           />
-          {errors.phone && <p className="text-sm text-red-600 mt-1">{errors.phone}</p>}
+          {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
         </div>
 
         {errors.contact && !errors.email && !errors.phone && (
@@ -172,14 +172,14 @@ export function ClientForm({ salonId, bookingData, onSubmit, onBack }: ClientFor
 
         {/* Notes (Optional) */}
         <div>
-          <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="notes" className="mb-1 block text-sm font-medium text-gray-700">
             Special Requests (Optional)
           </label>
           <textarea
             id="notes"
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
             placeholder="Any special requests or notes..."
             rows={3}
             disabled={isSubmitting}
@@ -188,7 +188,7 @@ export function ClientForm({ salonId, bookingData, onSubmit, onBack }: ClientFor
 
         {/* Submit Error */}
         {submitError && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4">
             <p className="text-sm text-red-800">{submitError}</p>
           </div>
         )}
@@ -197,13 +197,13 @@ export function ClientForm({ salonId, bookingData, onSubmit, onBack }: ClientFor
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full px-6 py-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors active:scale-[0.98]"
-          style={{ minHeight: '44px' }}
+          className="w-full rounded-lg bg-blue-600 px-6 py-4 font-medium text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+          style={{ minHeight: "44px" }}
         >
           {isSubmitting ? (
             <span className="flex items-center justify-center gap-2">
               <svg
-                className="animate-spin h-5 w-5"
+                className="h-5 w-5 animate-spin"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -225,10 +225,10 @@ export function ClientForm({ salonId, bookingData, onSubmit, onBack }: ClientFor
               Booking...
             </span>
           ) : (
-            'Confirm Booking'
+            "Confirm Booking"
           )}
         </button>
       </form>
     </div>
-  )
+  );
 }

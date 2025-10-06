@@ -1,12 +1,8 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import {
-  getClients,
-  createClient,
-  type ClientWithStats,
-} from '@/app/actions/clients'
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { getClients, createClient, type ClientWithStats } from "@/app/actions/clients";
 import {
   MagnifyingGlassIcon,
   PlusIcon,
@@ -15,60 +11,60 @@ import {
   EnvelopeIcon,
   CalendarIcon,
   CurrencyDollarIcon,
-} from '@heroicons/react/24/outline'
+} from "@heroicons/react/24/outline";
 
 export default function ClientsPage() {
-  const router = useRouter()
-  const [clients, setClients] = useState<ClientWithStats[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [showAddModal, setShowAddModal] = useState(false)
+  const router = useRouter();
+  const [clients, setClients] = useState<ClientWithStats[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
-    loadClients()
-  }, [])
+    loadClients();
+  }, []);
 
   async function loadClients(search?: string) {
-    setLoading(true)
+    setLoading(true);
     const result = await getClients({
       search,
-      salonId: '', // Will use session salonId
-    })
+      salonId: "", // Will use session salonId
+    });
 
     if (result.success && result.data) {
-      setClients(result.data)
+      setClients(result.data);
     } else {
-      console.error('Failed to load clients:', result.error)
+      console.error("Failed to load clients:", result.error);
     }
-    setLoading(false)
+    setLoading(false);
   }
 
   function handleSearch(value: string) {
-    setSearchTerm(value)
+    setSearchTerm(value);
     const timeoutId = setTimeout(() => {
-      loadClients(value)
-    }, 300)
-    return () => clearTimeout(timeoutId)
+      loadClients(value);
+    }, 300);
+    return () => clearTimeout(timeoutId);
   }
 
   function formatCurrency(amount: number) {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount)
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(amount);
   }
 
   function formatDate(date: Date | null) {
-    if (!date) return 'Never'
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    }).format(new Date(date))
+    if (!date) return "Never";
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(new Date(date));
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Clients</h1>
@@ -80,7 +76,7 @@ export default function ClientsPage() {
       {/* Search and Add */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Search Bar */}
-        <div className="relative flex-1 max-w-md">
+        <div className="relative max-w-md flex-1">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
             <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
           </div>
@@ -89,14 +85,14 @@ export default function ClientsPage() {
             placeholder="Search by name, email, or phone..."
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
-            className="block w-full rounded-lg border border-gray-300 pl-10 pr-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="block w-full rounded-lg border border-gray-300 py-2 pr-3 pl-10 text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
           />
         </div>
 
         {/* Add Client Button */}
         <button
           onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
         >
           <PlusIcon className="h-5 w-5" />
           Add Client
@@ -111,13 +107,9 @@ export default function ClientsPage() {
       ) : clients.length === 0 ? (
         <div className="rounded-lg border border-gray-200 bg-white p-12 text-center">
           <UserIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-lg font-medium text-gray-900">
-            No clients found
-          </h3>
+          <h3 className="mt-2 text-lg font-medium text-gray-900">No clients found</h3>
           <p className="mt-1 text-gray-500">
-            {searchTerm
-              ? 'Try adjusting your search'
-              : 'Get started by adding your first client'}
+            {searchTerm ? "Try adjusting your search" : "Get started by adding your first client"}
           </p>
           {!searchTerm && (
             <button
@@ -139,9 +131,7 @@ export default function ClientsPage() {
             >
               {/* Client Name */}
               <div className="mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {client.name}
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900">{client.name}</h3>
               </div>
 
               {/* Contact Info */}
@@ -205,41 +195,35 @@ export default function ClientsPage() {
         <AddClientModal
           onClose={() => setShowAddModal(false)}
           onSuccess={() => {
-            setShowAddModal(false)
-            loadClients(searchTerm)
+            setShowAddModal(false);
+            loadClients(searchTerm);
           }}
         />
       )}
     </div>
-  )
+  );
 }
 
 // ============================================
 // Add Client Modal Component
 // ============================================
 
-function AddClientModal({
-  onClose,
-  onSuccess,
-}: {
-  onClose: () => void
-  onSuccess: () => void
-}) {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+function AddClientModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    notes: '',
+    name: "",
+    email: "",
+    phone: "",
+    notes: "",
     emailNotificationsEnabled: true,
     smsNotificationsEnabled: true,
-  })
+  });
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
     const result = await createClient({
       name: formData.name,
@@ -248,90 +232,72 @@ function AddClientModal({
       notes: formData.notes || undefined,
       emailNotificationsEnabled: formData.emailNotificationsEnabled,
       smsNotificationsEnabled: formData.smsNotificationsEnabled,
-    })
+    });
 
     if (result.success) {
-      onSuccess()
+      onSuccess();
     } else {
-      setError(result.error || 'Failed to create client')
+      setError(result.error || "Failed to create client");
     }
 
-    setLoading(false)
+    setLoading(false);
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
         <h2 className="mb-4 text-xl font-bold text-gray-900">Add New Client</h2>
 
-        {error && (
-          <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">
-            {error}
-          </div>
-        )}
+        {error && <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">{error}</div>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-medium text-gray-700">
               Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               required
               value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
               placeholder="John Doe"
             />
           </div>
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
               value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
               placeholder="john@example.com"
             />
           </div>
 
           {/* Phone */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Phone
-            </label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Phone</label>
             <input
               type="tel"
               value={formData.phone}
-              onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
-              }
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
               placeholder="(555) 123-4567"
             />
           </div>
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notes
-            </label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Notes</label>
             <textarea
               value={formData.notes}
-              onChange={(e) =>
-                setFormData({ ...formData, notes: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={3}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
               placeholder="Any special notes about this client..."
             />
           </div>
@@ -350,9 +316,7 @@ function AddClientModal({
                 }
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700">
-                Enable email notifications
-              </span>
+              <span className="text-sm text-gray-700">Enable email notifications</span>
             </label>
             <label className="flex items-center gap-2">
               <input
@@ -366,9 +330,7 @@ function AddClientModal({
                 }
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700">
-                Enable SMS notifications
-              </span>
+              <span className="text-sm text-gray-700">Enable SMS notifications</span>
             </label>
           </div>
 
@@ -377,20 +339,20 @@ function AddClientModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+              className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:opacity-50"
             >
-              {loading ? 'Adding...' : 'Add Client'}
+              {loading ? "Adding..." : "Add Client"}
             </button>
           </div>
         </form>
       </div>
     </div>
-  )
+  );
 }

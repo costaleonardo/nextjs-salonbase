@@ -1,19 +1,15 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import {
-  PaymentElement,
-  useStripe,
-  useElements
-} from '@stripe/react-stripe-js'
-import { StripePaymentElementOptions } from '@stripe/stripe-js'
-import { confirmStripePayment } from '@/app/actions/payments'
+import { useState } from "react";
+import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { StripePaymentElementOptions } from "@stripe/stripe-js";
+import { confirmStripePayment } from "@/app/actions/payments";
 
 interface StripeCardInputProps {
-  onSuccess: (paymentIntentId: string) => void
-  onError: (error: string) => void
-  amount: number
-  appointmentId: string
+  onSuccess: (paymentIntentId: string) => void;
+  onError: (error: string) => void;
+  amount: number;
+  appointmentId: string;
 }
 
 /**
@@ -30,23 +26,23 @@ export default function StripeCardInput({
   onSuccess,
   onError,
   amount,
-  appointmentId
+  appointmentId,
 }: StripeCardInputProps) {
-  const stripe = useStripe()
-  const elements = useElements()
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
+    event.preventDefault();
 
     if (!stripe || !elements) {
-      setErrorMessage('Stripe has not loaded yet. Please try again.')
-      return
+      setErrorMessage("Stripe has not loaded yet. Please try again.");
+      return;
     }
 
-    setIsProcessing(true)
-    setErrorMessage(null)
+    setIsProcessing(true);
+    setErrorMessage(null);
 
     try {
       // Confirm the payment on the client
@@ -55,99 +51,106 @@ export default function StripeCardInput({
         confirmParams: {
           return_url: `${window.location.origin}/dashboard/appointments?payment=success`,
         },
-        redirect: 'if_required', // Only redirect if required for 3D Secure
-      })
+        redirect: "if_required", // Only redirect if required for 3D Secure
+      });
 
       if (error) {
         // Payment failed
-        setErrorMessage(error.message || 'Payment failed')
-        onError(error.message || 'Payment failed')
-      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        setErrorMessage(error.message || "Payment failed");
+        onError(error.message || "Payment failed");
+      } else if (paymentIntent && paymentIntent.status === "succeeded") {
         // Payment succeeded - now confirm it on the server
         const result = await confirmStripePayment({
           appointmentId,
-          stripePaymentIntentId: paymentIntent.id
-        })
+          stripePaymentIntentId: paymentIntent.id,
+        });
 
         if (!result.success) {
-          setErrorMessage(result.error || 'Failed to confirm payment')
-          onError(result.error || 'Failed to confirm payment')
+          setErrorMessage(result.error || "Failed to confirm payment");
+          onError(result.error || "Failed to confirm payment");
         } else {
-          onSuccess(paymentIntent.id)
+          onSuccess(paymentIntent.id);
         }
       } else {
         // Payment requires additional action (shouldn't happen with redirect: 'if_required')
-        setErrorMessage('Payment requires additional authentication')
-        onError('Payment requires additional authentication')
+        setErrorMessage("Payment requires additional authentication");
+        onError("Payment requires additional authentication");
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'An unexpected error occurred'
-      setErrorMessage(message)
-      onError(message)
+      const message = err instanceof Error ? err.message : "An unexpected error occurred";
+      setErrorMessage(message);
+      onError(message);
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   const paymentElementOptions: StripePaymentElementOptions = {
     layout: {
-      type: 'accordion',
+      type: "accordion",
       defaultCollapsed: false,
       radios: true,
-      spacedAccordionItems: false
+      spacedAccordionItems: false,
     },
     // Mobile optimization
     fields: {
       billingDetails: {
         address: {
-          country: 'never' // Simplify for mobile
-        }
-      }
+          country: "never", // Simplify for mobile
+        },
+      },
     },
     // Terms display
     terms: {
-      card: 'never'
-    }
-  }
+      card: "never",
+    },
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
-        <PaymentElement
-          options={paymentElementOptions}
-          className="mb-4"
-        />
+      <div className="rounded-lg border border-gray-200 bg-white p-4 sm:p-6">
+        <PaymentElement options={paymentElementOptions} className="mb-4" />
       </div>
 
       {errorMessage && (
-        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm">
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
           {errorMessage}
         </div>
       )}
 
-      <div className="bg-gray-50 px-4 py-3 rounded-lg">
-        <div className="flex justify-between items-center text-sm">
+      <div className="rounded-lg bg-gray-50 px-4 py-3">
+        <div className="flex items-center justify-between text-sm">
           <span className="text-gray-600">Amount to charge:</span>
-          <span className="text-lg font-semibold text-gray-900">
-            ${amount.toFixed(2)}
-          </span>
+          <span className="text-lg font-semibold text-gray-900">${amount.toFixed(2)}</span>
         </div>
       </div>
 
       <button
         type="submit"
         disabled={!stripe || isProcessing}
-        className="w-full bg-blue-600 text-white font-medium py-3 px-4 rounded-lg
-                   hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500
-                   focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed
-                   transition-colors duration-200 text-base sm:text-lg
-                   min-h-[44px] touch-manipulation" // Touch target optimization
+        className="min-h-[44px] w-full touch-manipulation rounded-lg bg-blue-600 px-4 py-3 text-base font-medium text-white transition-colors duration-200 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-400 sm:text-lg" // Touch target optimization
       >
         {isProcessing ? (
           <span className="flex items-center justify-center">
-            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <svg
+              className="mr-3 -ml-1 h-5 w-5 animate-spin text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
             </svg>
             Processing...
           </span>
@@ -156,9 +159,10 @@ export default function StripeCardInput({
         )}
       </button>
 
-      <p className="text-xs text-gray-500 text-center">
-        Your payment is secured by Stripe. Your card details are encrypted and never stored on our servers.
+      <p className="text-center text-xs text-gray-500">
+        Your payment is secured by Stripe. Your card details are encrypted and never stored on our
+        servers.
       </p>
     </form>
-  )
+  );
 }

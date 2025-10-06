@@ -19,6 +19,7 @@ All tasks from the "Email/SMS Notification Setup" section of Phase 3 have been c
 **Status:** Already existed, verified configuration
 
 The email service provides:
+
 - `sendEmail()` - Send emails with React components, HTML, or plain text
 - `sendEmailFromComponent()` - Send from React Email components
 - `renderEmailToHtml()` - Preview/test email templates
@@ -33,6 +34,7 @@ The email service provides:
 **Status:** ✅ Created
 
 The SMS service provides:
+
 - `sendSMS()` - Send SMS messages via Twilio
 - `formatPhoneNumber()` - Convert phone numbers to E.164 format
 - `isValidPhoneNumber()` - Validate phone number format
@@ -49,16 +51,19 @@ The SMS service provides:
 Templates built with `@react-email/components`:
 
 **AppointmentConfirmation.tsx**
+
 - Sent immediately after booking
 - Includes appointment details, service info, salon info
 - Professional HTML email layout
 
 **AppointmentReminder.tsx**
+
 - Sent 24 hours before appointment
 - Reminder format with essential details
 - Same professional styling
 
 **README.md**
+
 - Documentation on using templates
 - Code examples
 - Instructions for creating new templates
@@ -68,6 +73,7 @@ Templates built with `@react-email/components`:
 **Status:** ✅ Created
 
 **templates.ts** - Pre-formatted SMS messages:
+
 - `appointmentConfirmationSMS` - Booking confirmation
 - `appointmentReminderSMS` - 24-hour reminder
 - `appointmentCancellationSMS` - Cancellation notice
@@ -75,6 +81,7 @@ Templates built with `@react-email/components`:
 - `paymentReceiptSMS` - Payment confirmation
 
 **README.md**
+
 - Documentation on using SMS templates
 - Phone number formatting guidance
 - Best practices (timing, length, compliance)
@@ -87,12 +94,14 @@ Templates built with `@react-email/components`:
 Added comprehensive documentation for:
 
 **Email (Resend):**
+
 ```
 EMAIL_API_KEY=re_...                    # Required for email functionality
 EMAIL_FROM=noreply@yourdomain.com       # Optional, defaults to noreply@salonbase.app
 ```
 
 **SMS (Twilio):**
+
 ```
 TWILIO_ACCOUNT_SID=AC...      # Required for SMS functionality
 TWILIO_AUTH_TOKEN=...         # Required for SMS functionality
@@ -104,6 +113,7 @@ TWILIO_PHONE_NUMBER=+1...     # Your Twilio phone number in E.164 format
 **Status:** ✅ Created `scripts/test-email-sms.ts`
 
 Comprehensive test script that:
+
 - Checks environment variable configuration
 - Tests email sending (confirmation, reminder, plain text)
 - Tests SMS sending (confirmation, reminder)
@@ -111,6 +121,7 @@ Comprehensive test script that:
 - Provides detailed console output
 
 **Run with:**
+
 ```bash
 npm run test:email-sms
 ```
@@ -120,6 +131,7 @@ npm run test:email-sms
 **Status:** ✅ Updated
 
 **CLAUDE.md:**
+
 - Added Resend and Twilio to Technology Stack
 - Added test command to Testing & Verification section
 - Added Email & Receipt System documentation
@@ -127,9 +139,11 @@ npm run test:email-sms
 - Updated Current Implementation Status
 
 **CHECKLIST.md:**
+
 - Marked all Email/SMS Notification Setup tasks as complete
 
 **package.json:**
+
 - Added `test:email-sms` script
 
 ## File Structure
@@ -168,12 +182,12 @@ The following tasks are in the "Notification System" section and are separate fr
 ### Sending an Appointment Confirmation Email
 
 ```typescript
-import { sendEmail } from '@/lib/email'
-import AppointmentConfirmationEmail from '@/components/emails/AppointmentConfirmation'
+import { sendEmail } from "@/lib/email";
+import AppointmentConfirmationEmail from "@/components/emails/AppointmentConfirmation";
 
 await sendEmail({
   to: client.email,
-  subject: 'Your appointment is confirmed',
+  subject: "Your appointment is confirmed",
   react: AppointmentConfirmationEmail({
     clientName: client.name,
     serviceName: service.name,
@@ -185,26 +199,26 @@ await sendEmail({
     salonPhone: salon.phone,
     price: service.price.toString(),
   }),
-})
+});
 ```
 
 ### Sending an Appointment Confirmation SMS
 
 ```typescript
-import { sendSMS, formatPhoneNumber } from '@/lib/sms'
-import { appointmentConfirmationSMS } from '@/components/sms/templates'
+import { sendSMS, formatPhoneNumber } from "@/lib/sms";
+import { appointmentConfirmationSMS } from "@/components/sms/templates";
 
 const message = appointmentConfirmationSMS({
   salonName: salon.name,
   serviceName: service.name,
-  appointmentDate: 'Mon Jan 15',
-  appointmentTime: '2:00 PM',
-})
+  appointmentDate: "Mon Jan 15",
+  appointmentTime: "2:00 PM",
+});
 
 await sendSMS({
   to: formatPhoneNumber(client.phone),
   body: message,
-})
+});
 ```
 
 ## Testing
@@ -221,6 +235,7 @@ Before using in production:
    - Fill in your actual API keys and credentials
 
 3. **Run the test script:**
+
    ```bash
    npm run test:email-sms
    ```
@@ -233,10 +248,12 @@ Before using in production:
 ## Cost Estimates
 
 **Resend:**
+
 - Free tier: 3,000 emails/month
 - Pro: $20/month for 50,000 emails
 
 **Twilio:**
+
 - SMS (US): ~$0.0079 per message
 - Phone number: ~$1.15/month
 - Estimate: ~$50/month for 5,000 SMS messages
@@ -246,11 +263,13 @@ Before using in production:
 ## Compliance Notes
 
 **Email (CAN-SPAM):**
+
 - Include unsubscribe link (add to templates when needed)
 - Use accurate subject lines
 - Include physical address in footer
 
 **SMS (TCPA):**
+
 - Obtain explicit consent before sending
 - Honor opt-out requests (STOP) - Twilio handles automatically
 - Don't send outside 8 AM - 9 PM local time

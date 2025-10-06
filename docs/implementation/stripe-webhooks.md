@@ -32,16 +32,19 @@ Implemented a complete Stripe webhook handler to process payment events asynchro
 ### Handled Events
 
 #### 1. `payment_intent.succeeded`
+
 - **Action:** Updates payment status from `PENDING` → `COMPLETED`
 - **Audit Log:** Creates entry with action `payment_succeeded`
 - **Metadata:** Stores completion timestamp and payment details
 
 #### 2. `payment_intent.payment_failed`
+
 - **Action:** Updates payment status from `PENDING` → `FAILED`
 - **Audit Log:** Creates entry with action `payment_failed`
 - **Metadata:** Stores error message, error code, and failure timestamp
 
 #### 3. `charge.refunded`
+
 - **Action:** Updates payment status from `COMPLETED` → `REFUNDED`
 - **Audit Log:** Creates entry with action `payment_refunded`
 - **Metadata:** Stores refunded amount, charge ID, and refund reason
@@ -49,12 +52,14 @@ Implemented a complete Stripe webhook handler to process payment events asynchro
 ## Security Features
 
 ### Webhook Signature Verification
+
 - ✅ Validates all webhook requests using Stripe signature
 - ✅ Rejects unsigned or tampered requests
 - ✅ Uses `STRIPE_WEBHOOK_SECRET` environment variable
 - ✅ Prevents spoofing attacks
 
 ### Database Transactions
+
 - ✅ All updates wrapped in database transactions
 - ✅ Atomic updates (payment + audit log together)
 - ✅ Automatic rollback on errors
@@ -79,6 +84,7 @@ Every webhook event creates a detailed audit log entry:
 ```
 
 This ensures **complete traceability** for all payment events, which is critical for:
+
 - Dispute resolution
 - Debugging payment issues
 - Compliance and auditing
@@ -89,16 +95,19 @@ This ensures **complete traceability** for all payment events, which is critical
 ### Local Testing Setup
 
 1. **Install Stripe CLI:**
+
    ```bash
    brew install stripe/stripe-cli/stripe
    ```
 
 2. **Login to Stripe:**
+
    ```bash
    stripe login
    ```
 
 3. **Start webhook forwarding:**
+
    ```bash
    stripe listen --forward-to localhost:3000/api/webhooks/stripe
    ```
@@ -148,24 +157,29 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
 In Vercel:
+
 - Dashboard → Settings → Environment Variables
 - Or via CLI: `vercel env add STRIPE_WEBHOOK_SECRET production`
 
 ## Error Handling
 
 ### Logged Errors
+
 - Missing signature header
 - Signature verification failure
 - Payment not found for PaymentIntent
 - Database transaction errors
 
 ### Response Codes
+
 - `200` - Webhook processed successfully
 - `400` - Invalid signature or missing header
 - `500` - Internal processing error
 
 ### Logging
+
 All webhook events are logged with context:
+
 ```
 [Stripe Webhook] Received event: payment_intent.succeeded (evt_...)
 [Stripe Webhook] Payment X marked as COMPLETED (appointment: Y)
@@ -174,12 +188,14 @@ All webhook events are logged with context:
 ## Integration with Payment Flow
 
 ### Before Webhooks
+
 1. Client creates Payment Intent via app
 2. Payment record created with status: `PENDING`
 3. Client completes payment in browser
 4. **Payment Intent succeeds in Stripe**
 
 ### After Webhooks (Asynchronous)
+
 5. Stripe sends `payment_intent.succeeded` webhook
 6. Webhook handler verifies signature
 7. Payment status updated to `COMPLETED`
@@ -189,16 +205,19 @@ All webhook events are logged with context:
 ## Critical Notes
 
 ⚠️ **Payment Processing:**
+
 - Webhooks are the **source of truth** for payment status
 - Never rely solely on client-side confirmation
 - Always check payment status in database before fulfilling services
 
 ⚠️ **Idempotency:**
+
 - Stripe may send duplicate webhook events
 - Current implementation handles duplicates gracefully
 - Status updates are idempotent (can be applied multiple times)
 
 ⚠️ **Timing:**
+
 - Webhooks are asynchronous (may arrive seconds after payment)
 - Show "Processing..." state in UI until webhook processes
 - Poll payment status or use websockets for real-time updates
@@ -206,6 +225,7 @@ All webhook events are logged with context:
 ## Success Criteria
 
 ✅ **All completed:**
+
 - [x] Webhook signature verification implemented
 - [x] All three critical events handled
 - [x] Database updates with transactions
@@ -217,11 +237,13 @@ All webhook events are logged with context:
 ## Next Steps
 
 ### Immediate
+
 - [ ] Set up webhook endpoint in Stripe dashboard (production)
 - [ ] Test webhook delivery in production environment
 - [ ] Monitor webhook failures in Stripe dashboard
 
 ### Future Enhancements
+
 - [ ] Add webhook retry logic for failed deliveries
 - [ ] Implement webhook event replay for debugging
 - [ ] Add monitoring/alerting for webhook failures

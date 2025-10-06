@@ -1,36 +1,40 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { updateAppointment, cancelAppointment, checkAppointmentConflicts } from '@/app/actions/appointments'
-import { Appointment } from '../appointments-view'
-import { AppointmentStatus } from '@prisma/client'
+import { useState, useEffect } from "react";
+import {
+  updateAppointment,
+  cancelAppointment,
+  checkAppointmentConflicts,
+} from "@/app/actions/appointments";
+import { Appointment } from "../appointments-view";
+import { AppointmentStatus } from "@prisma/client";
 
 type EditAppointmentModalProps = {
-  isOpen: boolean
-  appointment: Appointment
-  onClose: () => void
-  onSuccess: () => void
-  onDelete: () => void
-}
+  isOpen: boolean;
+  appointment: Appointment;
+  onClose: () => void;
+  onSuccess: () => void;
+  onDelete: () => void;
+};
 
 type Client = {
-  id: string
-  name: string
-  email: string | null
-  phone: string | null
-}
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+};
 
 type Staff = {
-  id: string
-  name: string
-}
+  id: string;
+  name: string;
+};
 
 type Service = {
-  id: string
-  name: string
-  duration: number
-  price: number
-}
+  id: string;
+  name: string;
+  duration: number;
+  price: number;
+};
 
 export function EditAppointmentModal({
   isOpen,
@@ -39,33 +43,33 @@ export function EditAppointmentModal({
   onSuccess,
   onDelete,
 }: EditAppointmentModalProps) {
-  const [clients, setClients] = useState<Client[]>([])
-  const [staff, setStaff] = useState<Staff[]>([])
-  const [services, setServices] = useState<Service[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [conflictWarning, setConflictWarning] = useState<string | null>(null)
-  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
+  const [clients, setClients] = useState<Client[]>([]);
+  const [staff, setStaff] = useState<Staff[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [conflictWarning, setConflictWarning] = useState<string | null>(null);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
-  const appointmentDate = new Date(appointment.datetime)
+  const appointmentDate = new Date(appointment.datetime);
   const [formData, setFormData] = useState({
     clientId: appointment.client.id,
     staffId: appointment.staff.id,
     serviceId: appointment.service.id,
-    date: appointmentDate.toISOString().split('T')[0],
+    date: appointmentDate.toISOString().split("T")[0],
     time: appointmentDate.toTimeString().slice(0, 5),
     status: appointment.status,
-    notes: appointment.notes || '',
-  })
+    notes: appointment.notes || "",
+  });
 
   // Fetch data when modal opens
   useEffect(() => {
     if (isOpen) {
-      fetchClients()
-      fetchStaff()
-      fetchServices()
+      fetchClients();
+      fetchStaff();
+      fetchServices();
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   // Check for conflicts when datetime or staff changes
   useEffect(() => {
@@ -76,78 +80,78 @@ export function EditAppointmentModal({
       formData.time &&
       (formData.staffId !== appointment.staff.id ||
         formData.serviceId !== appointment.service.id ||
-        formData.date !== appointmentDate.toISOString().split('T')[0] ||
+        formData.date !== appointmentDate.toISOString().split("T")[0] ||
         formData.time !== appointmentDate.toTimeString().slice(0, 5))
     ) {
-      checkConflicts()
+      checkConflicts();
     } else {
-      setConflictWarning(null)
+      setConflictWarning(null);
     }
-  }, [formData.staffId, formData.serviceId, formData.date, formData.time])
+  }, [formData.staffId, formData.serviceId, formData.date, formData.time]);
 
   async function fetchClients() {
     try {
-      const response = await fetch('/api/clients')
+      const response = await fetch("/api/clients");
       if (response.ok) {
-        const data = await response.json()
-        setClients(data)
+        const data = await response.json();
+        setClients(data);
       }
     } catch (error) {
-      console.error('Error fetching clients:', error)
+      console.error("Error fetching clients:", error);
     }
   }
 
   async function fetchStaff() {
     try {
-      const response = await fetch('/api/staff')
+      const response = await fetch("/api/staff");
       if (response.ok) {
-        const data = await response.json()
-        setStaff(data)
+        const data = await response.json();
+        setStaff(data);
       }
     } catch (error) {
-      console.error('Error fetching staff:', error)
+      console.error("Error fetching staff:", error);
     }
   }
 
   async function fetchServices() {
     try {
-      const response = await fetch('/api/services')
+      const response = await fetch("/api/services");
       if (response.ok) {
-        const data = await response.json()
-        setServices(data)
+        const data = await response.json();
+        setServices(data);
       }
     } catch (error) {
-      console.error('Error fetching services:', error)
+      console.error("Error fetching services:", error);
     }
   }
 
   async function checkConflicts() {
     try {
-      const datetime = new Date(`${formData.date}T${formData.time}`)
+      const datetime = new Date(`${formData.date}T${formData.time}`);
       const result = await checkAppointmentConflicts(
         formData.staffId,
         formData.serviceId,
         datetime,
         appointment.id
-      )
+      );
 
       if (result.success && result.data.hasConflict) {
-        setConflictWarning(result.data.conflict?.details || 'Time slot unavailable')
+        setConflictWarning(result.data.conflict?.details || "Time slot unavailable");
       } else {
-        setConflictWarning(null)
+        setConflictWarning(null);
       }
     } catch (error) {
-      console.error('Error checking conflicts:', error)
+      console.error("Error checking conflicts:", error);
     }
   }
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setError(null)
-    setLoading(true)
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
 
     try {
-      const datetime = new Date(`${formData.date}T${formData.time}`)
+      const datetime = new Date(`${formData.date}T${formData.time}`);
 
       const result = await updateAppointment({
         id: appointment.id,
@@ -157,54 +161,56 @@ export function EditAppointmentModal({
         datetime,
         status: formData.status as AppointmentStatus,
         notes: formData.notes || undefined,
-      })
+      });
 
       if (result.success) {
-        onSuccess()
+        onSuccess();
       } else {
-        setError(result.error)
+        setError(result.error);
       }
     } catch (error) {
-      setError('Failed to update appointment')
+      setError("Failed to update appointment");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   async function handleCancel() {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
 
     try {
-      const result = await cancelAppointment(appointment.id)
+      const result = await cancelAppointment(appointment.id);
 
       if (result.success) {
-        onDelete()
+        onDelete();
       } else {
-        setError(result.error)
+        setError(result.error);
       }
     } catch (error) {
-      setError('Failed to cancel appointment')
+      setError("Failed to cancel appointment");
     } finally {
-      setLoading(false)
-      setShowCancelConfirm(false)
+      setLoading(false);
+      setShowCancelConfirm(false);
     }
   }
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto m-4">
+    <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
+      <div className="m-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white shadow-xl">
         <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
+          <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">Edit Appointment</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -213,19 +219,17 @@ export function EditAppointmentModal({
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Client Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Client *
-                </label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Client *</label>
                 <select
                   required
                   value={formData.clientId}
                   onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 >
                   <option value="">Select a client</option>
                   {clients.map((client) => (
                     <option key={client.id} value={client.id}>
-                      {client.name} {client.email ? `(${client.email})` : ''}
+                      {client.name} {client.email ? `(${client.email})` : ""}
                     </option>
                   ))}
                 </select>
@@ -233,14 +237,12 @@ export function EditAppointmentModal({
 
               {/* Service Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Service *
-                </label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Service *</label>
                 <select
                   required
                   value={formData.serviceId}
                   onChange={(e) => setFormData({ ...formData, serviceId: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 >
                   <option value="">Select a service</option>
                   {services.map((service) => (
@@ -253,14 +255,14 @@ export function EditAppointmentModal({
 
               {/* Staff Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="mb-1 block text-sm font-medium text-gray-700">
                   Staff Member *
                 </label>
                 <select
                   required
                   value={formData.staffId}
                   onChange={(e) => setFormData({ ...formData, staffId: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 >
                   <option value="">Select staff member</option>
                   {staff.map((member) => (
@@ -274,41 +276,35 @@ export function EditAppointmentModal({
               {/* Date & Time */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Date *
-                  </label>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">Date *</label>
                   <input
                     type="date"
                     required
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Time *
-                  </label>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">Time *</label>
                   <input
                     type="time"
                     required
                     value={formData.time}
                     onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
               </div>
 
               {/* Status */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Status *
-                </label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Status *</label>
                 <select
                   required
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 >
                   <option value="SCHEDULED">Scheduled</option>
                   <option value="COMPLETED">Completed</option>
@@ -319,10 +315,18 @@ export function EditAppointmentModal({
 
               {/* Conflict Warning */}
               {conflictWarning && (
-                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3">
                   <div className="flex items-start">
-                    <svg className="w-5 h-5 text-yellow-600 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    <svg
+                      className="mt-0.5 mr-2 h-5 w-5 text-yellow-600"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     <p className="text-sm text-yellow-800">{conflictWarning}</p>
                   </div>
@@ -331,21 +335,21 @@ export function EditAppointmentModal({
 
               {/* Notes */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="mb-1 block text-sm font-medium text-gray-700">
                   Notes (optional)
                 </label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   placeholder="Add any special notes or requests..."
                 />
               </div>
 
               {/* Error Message */}
               {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                <div className="rounded-md border border-red-200 bg-red-50 p-3">
                   <p className="text-sm text-red-800">{error}</p>
                 </div>
               )}
@@ -355,7 +359,7 @@ export function EditAppointmentModal({
                 <button
                   type="button"
                   onClick={() => setShowCancelConfirm(true)}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                  className="rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
                 >
                   Cancel Appointment
                 </button>
@@ -363,16 +367,16 @@ export function EditAppointmentModal({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                    className="rounded-md border border-gray-300 px-4 py-2 hover:bg-gray-50"
                   >
                     Close
                   </button>
                   <button
                     type="submit"
                     disabled={loading || !!conflictWarning}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400"
                   >
-                    {loading ? 'Saving...' : 'Save Changes'}
+                    {loading ? "Saving..." : "Save Changes"}
                   </button>
                 </div>
               </div>
@@ -380,30 +384,37 @@ export function EditAppointmentModal({
           ) : (
             // Cancel Confirmation
             <div className="space-y-4">
-              <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-                <h3 className="text-lg font-semibold text-red-900 mb-2">
+              <div className="rounded-md border border-red-200 bg-red-50 p-4">
+                <h3 className="mb-2 text-lg font-semibold text-red-900">
                   Cancel this appointment?
                 </h3>
                 <p className="text-sm text-red-800">
-                  This will mark the appointment as cancelled. This action can be undone by editing the appointment status.
+                  This will mark the appointment as cancelled. This action can be undone by editing
+                  the appointment status.
                 </p>
               </div>
 
               {/* Appointment Details */}
-              <div className="border border-gray-200 rounded-md p-4 bg-gray-50">
-                <div className="text-sm space-y-1">
-                  <div><span className="font-medium">Client:</span> {appointment.client.name}</div>
-                  <div><span className="font-medium">Service:</span> {appointment.service.name}</div>
-                  <div><span className="font-medium">Staff:</span> {appointment.staff.name}</div>
+              <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
+                <div className="space-y-1 text-sm">
                   <div>
-                    <span className="font-medium">Date/Time:</span>{' '}
-                    {appointmentDate.toLocaleString('en-US', {
-                      weekday: 'short',
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                      hour: 'numeric',
-                      minute: '2-digit',
+                    <span className="font-medium">Client:</span> {appointment.client.name}
+                  </div>
+                  <div>
+                    <span className="font-medium">Service:</span> {appointment.service.name}
+                  </div>
+                  <div>
+                    <span className="font-medium">Staff:</span> {appointment.staff.name}
+                  </div>
+                  <div>
+                    <span className="font-medium">Date/Time:</span>{" "}
+                    {appointmentDate.toLocaleString("en-US", {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
                       hour12: true,
                     })}
                   </div>
@@ -412,7 +423,7 @@ export function EditAppointmentModal({
 
               {/* Error Message */}
               {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                <div className="rounded-md border border-red-200 bg-red-50 p-3">
                   <p className="text-sm text-red-800">{error}</p>
                 </div>
               )}
@@ -422,7 +433,7 @@ export function EditAppointmentModal({
                 <button
                   type="button"
                   onClick={() => setShowCancelConfirm(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                  className="rounded-md border border-gray-300 px-4 py-2 hover:bg-gray-50"
                 >
                   Go Back
                 </button>
@@ -430,9 +441,9 @@ export function EditAppointmentModal({
                   type="button"
                   onClick={handleCancel}
                   disabled={loading}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-400"
                 >
-                  {loading ? 'Cancelling...' : 'Yes, Cancel Appointment'}
+                  {loading ? "Cancelling..." : "Yes, Cancel Appointment"}
                 </button>
               </div>
             </div>
@@ -440,5 +451,5 @@ export function EditAppointmentModal({
         </div>
       </div>
     </div>
-  )
+  );
 }

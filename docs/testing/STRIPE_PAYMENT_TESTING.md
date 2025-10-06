@@ -16,46 +16,47 @@ Use these Stripe test cards for different scenarios. **Note:** Use Stripe Elemen
 
 ### US Cards (Should Succeed)
 
-| Card Type | Number | Description |
-|-----------|--------|-------------|
-| Visa | `4242424242424242` | Basic US Visa card |
-| Visa Debit | `4000056655665556` | US Visa debit card |
-| Mastercard | `5555555555554444` | Basic US Mastercard |
+| Card Type        | Number             | Description         |
+| ---------------- | ------------------ | ------------------- |
+| Visa             | `4242424242424242` | Basic US Visa card  |
+| Visa Debit       | `4000056655665556` | US Visa debit card  |
+| Mastercard       | `5555555555554444` | Basic US Mastercard |
 | Mastercard Debit | `5200828282828210` | US Mastercard debit |
-| Amex | `378282246310005` | American Express |
-| Discover | `6011111111111117` | Discover card |
+| Amex             | `378282246310005`  | American Express    |
+| Discover         | `6011111111111117` | Discover card       |
 
 For all cards, use:
+
 - Any future expiration date (e.g., 12/25)
 - Any 3-digit CVC (4 digits for Amex)
 - Any billing zip code
 
 ### 3D Secure / SCA Cards
 
-| Card Number | Description |
-|-------------|-------------|
-| `4000002500003155` | Requires authentication (always) |
+| Card Number        | Description                        |
+| ------------------ | ---------------------------------- |
+| `4000002500003155` | Requires authentication (always)   |
 | `4000002760003184` | Supports authentication (optional) |
-| `4000008260000000` | UK card with 3D Secure |
+| `4000008260000000` | UK card with 3D Secure             |
 
 ### Declined Cards (Should Fail)
 
-| Card Number | Decline Reason |
-|-------------|----------------|
-| `4000000000000002` | Generic decline |
+| Card Number        | Decline Reason     |
+| ------------------ | ------------------ |
+| `4000000000000002` | Generic decline    |
 | `4000000000009995` | Insufficient funds |
-| `4000000000009987` | Lost card |
-| `4000000000009979` | Stolen card |
+| `4000000000009987` | Lost card          |
+| `4000000000009979` | Stolen card        |
 
 ### International Cards
 
-| Card Number | Country |
-|-------------|---------|
-| `4000000760000002` | Brazil |
-| `4000004840000008` | Mexico |
+| Card Number        | Country        |
+| ------------------ | -------------- |
+| `4000000760000002` | Brazil         |
+| `4000004840000008` | Mexico         |
 | `4000008260000000` | United Kingdom |
-| `4000000360000006` | Australia |
-| `4000001240000000` | Canada |
+| `4000000360000006` | Australia      |
+| `4000001240000000` | Canada         |
 
 ## Testing Checklist
 
@@ -311,16 +312,19 @@ npm run test:e2e -- stripe-payment
 ### Common Issues
 
 **Issue: "Payment Intent creation failed"**
+
 - Check Stripe API keys are set
 - Verify network connectivity
 - Check Stripe Dashboard for errors
 
 **Issue: "3D Secure not working on mobile"**
+
 - Verify `allow_redirects: 'never'` is set
 - Check return URL is configured
 - Test with different browsers
 
 **Issue: "Touch targets too small"**
+
 - Verify CSS has `min-h-[44px]` on buttons
 - Check `touch-manipulation` CSS is applied
 - Test on actual device, not just emulator

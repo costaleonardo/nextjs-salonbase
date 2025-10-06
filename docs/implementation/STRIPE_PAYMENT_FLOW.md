@@ -73,8 +73,8 @@ POST /api/payments/create-intent
 // After successful payment on client
 confirmStripePayment({
   appointmentId: "apt_123",
-  stripePaymentIntentId: "pi_xxx"
-})
+  stripePaymentIntentId: "pi_xxx",
+});
 
 // Server verifies with Stripe and saves to database
 // Creates audit log entry
@@ -118,6 +118,7 @@ confirmStripePayment({
 ### Audit Logging
 
 Every payment action is logged:
+
 - Payment Intent creation
 - Payment source selection
 - Payment attempt
@@ -129,24 +130,24 @@ Every payment action is logged:
 
 ### Successful Payments
 
-| Card | Number |
-|------|--------|
-| Visa | `4242424242424242` |
+| Card       | Number             |
+| ---------- | ------------------ |
+| Visa       | `4242424242424242` |
 | Mastercard | `5555555555554444` |
-| Amex | `378282246310005` |
+| Amex       | `378282246310005`  |
 
 ### 3D Secure Required
 
-| Card | Number |
-|------|--------|
-| 3DS Always | `4000002500003155` |
+| Card         | Number             |
+| ------------ | ------------------ |
+| 3DS Always   | `4000002500003155` |
 | 3DS Optional | `4000002760003184` |
 
 ### Declined Cards
 
-| Card | Number | Reason |
-|------|--------|--------|
-| Generic Decline | `4000000000000002` | Generic |
+| Card               | Number             | Reason     |
+| ------------------ | ------------------ | ---------- |
+| Generic Decline    | `4000000000000002` | Generic    |
 | Insufficient Funds | `4000000000009995` | No balance |
 
 ## API Reference
@@ -156,6 +157,7 @@ Every payment action is logged:
 **Endpoint:** `POST /api/payments/create-intent`
 
 **Request:**
+
 ```json
 {
   "appointmentId": "string",
@@ -164,6 +166,7 @@ Every payment action is logged:
 ```
 
 **Response:**
+
 ```json
 {
   "clientSecret": "string",
@@ -176,14 +179,16 @@ Every payment action is logged:
 **Server Action:** `confirmStripePayment()`
 
 **Parameters:**
+
 ```typescript
 {
-  appointmentId: string
-  stripePaymentIntentId: string
+  appointmentId: string;
+  stripePaymentIntentId: string;
 }
 ```
 
 **Returns:**
+
 ```typescript
 {
   success: boolean
@@ -256,6 +261,7 @@ npx dotenv -e .env.local -- npx tsx scripts/test-stripe-payment-flow.ts
 See [STRIPE_PAYMENT_TESTING.md](../testing/STRIPE_PAYMENT_TESTING.md) for complete testing guide.
 
 **Key Test Scenarios:**
+
 1. ✅ Successful payment with Visa
 2. ✅ 3D Secure authentication
 3. ✅ Card declined handling
@@ -310,6 +316,7 @@ See [STRIPE_PAYMENT_TESTING.md](../testing/STRIPE_PAYMENT_TESTING.md) for comple
 ## Support
 
 For issues or questions:
+
 1. Check [STRIPE_PAYMENT_TESTING.md](../testing/STRIPE_PAYMENT_TESTING.md)
 2. Review Stripe Dashboard for errors
 3. Check browser console for client errors

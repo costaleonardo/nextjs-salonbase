@@ -17,16 +17,16 @@ export const metadata: Metadata = {
   title: "SalonBase - Salon Management Platform",
   description: "Reliable salon management with payment processing you can trust",
   viewport: {
-    width: 'device-width',
+    width: "device-width",
     initialScale: 1,
     maximumScale: 5, // Allow pinch-to-zoom for accessibility
     userScalable: true,
   },
-  themeColor: '#2563eb', // Blue-600 brand color
+  themeColor: "#2563eb", // Blue-600 brand color
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
-    title: 'SalonBase',
+    statusBarStyle: "default",
+    title: "SalonBase",
   },
 };
 
@@ -37,9 +37,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>

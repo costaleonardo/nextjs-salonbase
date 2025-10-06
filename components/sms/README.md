@@ -7,47 +7,52 @@ This directory contains SMS message templates for notifications.
 All templates are defined in `templates.ts`:
 
 ### appointmentConfirmationSMS
+
 Sent immediately after an appointment is booked.
 
 **Usage:**
+
 ```typescript
-import { sendSMS } from '@/lib/sms'
-import { appointmentConfirmationSMS } from '@/components/sms/templates'
+import { sendSMS } from "@/lib/sms";
+import { appointmentConfirmationSMS } from "@/components/sms/templates";
 
 const message = appointmentConfirmationSMS({
-  salonName: 'My Salon',
-  serviceName: 'Haircut',
-  appointmentDate: 'Mon Jan 15',
-  appointmentTime: '2:00 PM',
-})
+  salonName: "My Salon",
+  serviceName: "Haircut",
+  appointmentDate: "Mon Jan 15",
+  appointmentTime: "2:00 PM",
+});
 
 await sendSMS({
-  to: '+15551234567',
+  to: "+15551234567",
   body: message,
-})
+});
 ```
 
 ### appointmentReminderSMS
+
 Sent 24 hours before an appointment.
 
 **Usage:**
+
 ```typescript
-import { sendSMS } from '@/lib/sms'
-import { appointmentReminderSMS } from '@/components/sms/templates'
+import { sendSMS } from "@/lib/sms";
+import { appointmentReminderSMS } from "@/components/sms/templates";
 
 const message = appointmentReminderSMS({
-  salonName: 'My Salon',
-  serviceName: 'Haircut',
-  appointmentTime: '2:00 PM',
-})
+  salonName: "My Salon",
+  serviceName: "Haircut",
+  appointmentTime: "2:00 PM",
+});
 
 await sendSMS({
-  to: '+15551234567',
+  to: "+15551234567",
   body: message,
-})
+});
 ```
 
 ### Other Templates
+
 - `appointmentCancellationSMS` - Sent when an appointment is cancelled
 - `appointmentRescheduledSMS` - Sent when an appointment is rescheduled
 - `paymentReceiptSMS` - Sent after a payment is received
@@ -57,13 +62,14 @@ await sendSMS({
 All phone numbers must be in E.164 format (e.g., `+15551234567`).
 
 Use the helper functions:
-```typescript
-import { formatPhoneNumber, isValidPhoneNumber } from '@/lib/sms'
 
-const phone = '555-123-4567'
+```typescript
+import { formatPhoneNumber, isValidPhoneNumber } from "@/lib/sms";
+
+const phone = "555-123-4567";
 if (isValidPhoneNumber(phone)) {
-  const formatted = formatPhoneNumber(phone) // Returns: +15551234567
-  await sendSMS({ to: formatted, body: message })
+  const formatted = formatPhoneNumber(phone); // Returns: +15551234567
+  await sendSMS({ to: formatted, body: message });
 }
 ```
 
@@ -81,21 +87,19 @@ Add new templates to `templates.ts`:
 
 ```typescript
 interface MyTemplateSMSParams {
-  name: string
-  detail: string
+  name: string;
+  detail: string;
 }
 
-export function myTemplateSMS({
-  name,
-  detail,
-}: MyTemplateSMSParams): string {
-  return `Hello ${name}, ${detail}. Reply STOP to unsubscribe.`
+export function myTemplateSMS({ name, detail }: MyTemplateSMSParams): string {
+  return `Hello ${name}, ${detail}. Reply STOP to unsubscribe.`;
 }
 ```
 
 ## Testing Templates
 
 Run the SMS test script:
+
 ```bash
 npx tsx scripts/test-email-sms.ts
 ```
@@ -103,6 +107,7 @@ npx tsx scripts/test-email-sms.ts
 ## Environment Variables
 
 Required for SMS functionality:
+
 ```
 TWILIO_ACCOUNT_SID=AC...         # Twilio Account SID
 TWILIO_AUTH_TOKEN=...            # Twilio Auth Token

@@ -1,33 +1,33 @@
-'use client'
+"use client";
 
-import { Service, User } from '@prisma/client'
+import { Service, User } from "@prisma/client";
 
 type BookingData = {
-  serviceId?: string
-  staffId?: string
-  datetime?: string
-  clientName?: string
-  clientEmail?: string
-  clientPhone?: string
-  notes?: string
-}
+  serviceId?: string;
+  staffId?: string;
+  datetime?: string;
+  clientName?: string;
+  clientEmail?: string;
+  clientPhone?: string;
+  notes?: string;
+};
 
 type SalonInfo = {
-  id: string
-  name: string
-  slug: string
-  email: string | null
-  phone: string | null
-  address: string | null
-}
+  id: string;
+  name: string;
+  slug: string;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+};
 
 type BookingConfirmationProps = {
-  salon: SalonInfo
-  bookingData: BookingData
-  appointmentId: string
-  selectedService?: Service
-  selectedStaff?: Pick<User, 'id' | 'name' | 'email'>
-}
+  salon: SalonInfo;
+  bookingData: BookingData;
+  appointmentId: string;
+  selectedService?: Service;
+  selectedStaff?: Pick<User, "id" | "name" | "email">;
+};
 
 export function BookingConfirmation({
   salon,
@@ -36,77 +36,72 @@ export function BookingConfirmation({
   selectedStaff,
 }: BookingConfirmationProps) {
   const formatDateTime = (datetime?: string) => {
-    if (!datetime) return ''
-    const date = new Date(datetime)
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
+    if (!datetime) return "";
+    const date = new Date(datetime);
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
       hour12: true,
-    })
-  }
+    });
+  };
 
   const addToCalendar = () => {
-    if (!bookingData.datetime || !selectedService) return
+    if (!bookingData.datetime || !selectedService) return;
 
-    const startDate = new Date(bookingData.datetime)
-    const endDate = new Date(startDate.getTime() + selectedService.duration * 60000)
+    const startDate = new Date(bookingData.datetime);
+    const endDate = new Date(startDate.getTime() + selectedService.duration * 60000);
 
     const formatCalendarDate = (date: Date) => {
-      return date.toISOString().replace(/-|:|\.\d+/g, '')
-    }
+      return date.toISOString().replace(/-|:|\.\d+/g, "");
+    };
 
-    const title = `${selectedService.name} at ${salon.name}`
-    const details = `Appointment with ${selectedStaff?.name || 'staff member'} at ${salon.name}`
-    const location = salon.address || salon.name
+    const title = `${selectedService.name} at ${salon.name}`;
+    const details = `Appointment with ${selectedStaff?.name || "staff member"} at ${salon.name}`;
+    const location = salon.address || salon.name;
 
     const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
       title
     )}&dates=${formatCalendarDate(startDate)}/${formatCalendarDate(
       endDate
-    )}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`
+    )}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
 
-    window.open(googleCalendarUrl, '_blank')
-  }
+    window.open(googleCalendarUrl, "_blank");
+  };
 
   return (
     <div className="text-center">
       {/* Success Icon */}
-      <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-green-100 rounded-full flex items-center justify-center mb-4">
+      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 sm:h-20 sm:w-20">
         <svg
-          className="w-8 h-8 sm:w-10 sm:h-10 text-green-600"
+          className="h-8 w-8 text-green-600 sm:h-10 sm:w-10"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M5 13l4 4L19 7"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
       </div>
 
       {/* Success Message */}
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Confirmed!</h2>
-      <p className="text-gray-600 mb-8">
-        You&apos;re all set! We&apos;ve sent a confirmation to{' '}
+      <h2 className="mb-2 text-2xl font-bold text-gray-900">Booking Confirmed!</h2>
+      <p className="mb-8 text-gray-600">
+        You&apos;re all set! We&apos;ve sent a confirmation to{" "}
         {bookingData.clientEmail || bookingData.clientPhone}.
       </p>
 
       {/* Appointment Details */}
-      <div className="bg-gray-50 rounded-lg p-6 mb-6 text-left">
-        <h3 className="font-semibold text-gray-900 mb-4">Appointment Details</h3>
+      <div className="mb-6 rounded-lg bg-gray-50 p-6 text-left">
+        <h3 className="mb-4 font-semibold text-gray-900">Appointment Details</h3>
         <div className="space-y-3">
           {/* Service */}
           {selectedService && (
             <div className="flex items-start gap-3">
               <svg
-                className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0"
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-gray-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -132,7 +127,7 @@ export function BookingConfirmation({
           {selectedStaff && (
             <div className="flex items-start gap-3">
               <svg
-                className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0"
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-gray-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -155,7 +150,7 @@ export function BookingConfirmation({
           {bookingData.datetime && (
             <div className="flex items-start gap-3">
               <svg
-                className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0"
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-gray-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -178,7 +173,7 @@ export function BookingConfirmation({
           {salon.address && (
             <div className="flex items-start gap-3">
               <svg
-                className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0"
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-gray-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -209,16 +204,16 @@ export function BookingConfirmation({
       <div className="space-y-3">
         <button
           onClick={addToCalendar}
-          className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors active:scale-[0.98]"
-          style={{ minHeight: '44px' }}
+          className="w-full rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none active:scale-[0.98]"
+          style={{ minHeight: "44px" }}
         >
           Add to Calendar
         </button>
 
         <button
           onClick={() => window.location.reload()}
-          className="w-full px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors active:scale-[0.98]"
-          style={{ minHeight: '44px' }}
+          className="w-full rounded-lg border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none active:scale-[0.98]"
+          style={{ minHeight: "44px" }}
         >
           Book Another Appointment
         </button>
@@ -226,13 +221,13 @@ export function BookingConfirmation({
 
       {/* Contact Info */}
       {(salon.phone || salon.email) && (
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <p className="text-sm text-gray-600 mb-2">Need to make changes?</p>
+        <div className="mt-8 border-t border-gray-200 pt-6">
+          <p className="mb-2 text-sm text-gray-600">Need to make changes?</p>
           <div className="flex flex-col items-center gap-2 text-sm">
             {salon.phone && (
               <a
                 href={`tel:${salon.phone}`}
-                className="text-blue-600 hover:text-blue-700 font-medium"
+                className="font-medium text-blue-600 hover:text-blue-700"
               >
                 Call {salon.phone}
               </a>
@@ -240,7 +235,7 @@ export function BookingConfirmation({
             {salon.email && (
               <a
                 href={`mailto:${salon.email}`}
-                className="text-blue-600 hover:text-blue-700 font-medium"
+                className="font-medium text-blue-600 hover:text-blue-700"
               >
                 Email {salon.email}
               </a>
@@ -249,5 +244,5 @@ export function BookingConfirmation({
         </div>
       )}
     </div>
-  )
+  );
 }

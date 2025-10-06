@@ -190,6 +190,7 @@ npx tsx scripts/test-notification-system.ts
 ```
 
 This will:
+
 - Find a test appointment
 - Check notification preferences
 - Schedule confirmation and reminder
@@ -198,10 +199,12 @@ This will:
 ### 2. Test Email Deliverability
 
 Requirements:
+
 - Valid `EMAIL_API_KEY` from Resend
 - Create an appointment with a client who has an email
 
 Steps:
+
 1. Create appointment
 2. Check email inbox
 3. Verify confirmation email received
@@ -210,11 +213,13 @@ Steps:
 ### 3. Test SMS Delivery
 
 Requirements:
+
 - Valid Twilio credentials
 - Create an appointment with a client who has a phone number
 - Phone number must be verified in Twilio test mode
 
 Steps:
+
 1. Create appointment
 2. Check SMS inbox
 3. Verify confirmation SMS received
@@ -229,6 +234,7 @@ Steps:
 Handles Inngest events and function registration.
 
 **Functions:**
+
 - `send-appointment-confirmation`
 - `send-appointment-reminder`
 - `send-appointment-cancellation`
@@ -239,12 +245,14 @@ Handles Inngest events and function registration.
 **Endpoint:** `GET /api/unsubscribe`
 
 **Query Parameters:**
+
 - `clientId` - Client ID to unsubscribe
 - `type` - Notification type (`email` or `sms`)
 
 **Response:** HTML success page
 
 **Example:**
+
 ```
 /api/unsubscribe?clientId=abc123&type=email
 ```
@@ -257,19 +265,19 @@ Handles Inngest events and function registration.
 // lib/notifications.ts
 
 // Schedule immediate confirmation
-await scheduleAppointmentConfirmation(appointmentId)
+await scheduleAppointmentConfirmation(appointmentId);
 
 // Schedule 24-hour reminder
-await scheduleAppointmentReminder(appointmentId, appointmentDateTime)
+await scheduleAppointmentReminder(appointmentId, appointmentDateTime);
 
 // Send immediate cancellation
-await sendAppointmentCancellation(appointmentId)
+await sendAppointmentCancellation(appointmentId);
 
 // Send immediate rescheduled notification
-await sendAppointmentRescheduled(appointmentId, oldDateTime, newDateTime)
+await sendAppointmentRescheduled(appointmentId, oldDateTime, newDateTime);
 
 // Cancel pending reminders
-await cancelPendingReminder(appointmentId)
+await cancelPendingReminder(appointmentId);
 ```
 
 ## Integration Points
@@ -320,10 +328,11 @@ All notifications tracked in database:
 const notifications = await db.notification.findMany({
   where: { status: "FAILED" },
   orderBy: { createdAt: "desc" },
-})
+});
 ```
 
 Check Inngest dashboard for:
+
 - Event history
 - Function runs
 - Failure rates

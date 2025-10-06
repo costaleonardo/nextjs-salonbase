@@ -83,11 +83,7 @@ export const sendAppointmentConfirmationNotification = inngest.createFunction(
     });
 
     if (!appointment) {
-      await updateNotificationStatus(
-        notificationId,
-        "FAILED",
-        "Appointment not found"
-      );
+      await updateNotificationStatus(notificationId, "FAILED", "Appointment not found");
       throw new Error("Appointment not found");
     }
 
@@ -97,15 +93,15 @@ export const sendAppointmentConfirmationNotification = inngest.createFunction(
     if (client.email && client.emailNotificationsEnabled) {
       await step.run("send-confirmation-email", async () => {
         try {
-          const appointmentDate = new Intl.DateTimeFormat('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
+          const appointmentDate = new Intl.DateTimeFormat("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
           }).format(new Date(appointment.datetime));
 
-          const appointmentTime = new Intl.DateTimeFormat('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
+          const appointmentTime = new Intl.DateTimeFormat("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
             hour12: true,
           }).format(new Date(appointment.datetime));
 
@@ -137,15 +133,15 @@ export const sendAppointmentConfirmationNotification = inngest.createFunction(
       await step.run("send-confirmation-sms", async () => {
         try {
           const datetimeObj = new Date(appointment.datetime);
-          const appointmentDate = new Intl.DateTimeFormat('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
+          const appointmentDate = new Intl.DateTimeFormat("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
           }).format(datetimeObj);
 
-          const appointmentTime = new Intl.DateTimeFormat('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
+          const appointmentTime = new Intl.DateTimeFormat("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
             hour12: true,
           }).format(datetimeObj);
 
@@ -197,21 +193,13 @@ export const sendAppointmentReminderNotification = inngest.createFunction(
     });
 
     if (!appointment) {
-      await updateNotificationStatus(
-        notificationId,
-        "FAILED",
-        "Appointment not found"
-      );
+      await updateNotificationStatus(notificationId, "FAILED", "Appointment not found");
       throw new Error("Appointment not found");
     }
 
     // Check if appointment was cancelled
     if (appointment.status === "CANCELLED") {
-      await updateNotificationStatus(
-        notificationId,
-        "CANCELLED",
-        "Appointment was cancelled"
-      );
+      await updateNotificationStatus(notificationId, "CANCELLED", "Appointment was cancelled");
       return { success: false, reason: "Appointment was cancelled" };
     }
 
@@ -221,15 +209,15 @@ export const sendAppointmentReminderNotification = inngest.createFunction(
     if (client.email && client.emailNotificationsEnabled) {
       await step.run("send-reminder-email", async () => {
         try {
-          const appointmentDate = new Intl.DateTimeFormat('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
+          const appointmentDate = new Intl.DateTimeFormat("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
           }).format(new Date(appointment.datetime));
 
-          const appointmentTime = new Intl.DateTimeFormat('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
+          const appointmentTime = new Intl.DateTimeFormat("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
             hour12: true,
           }).format(new Date(appointment.datetime));
 
@@ -260,9 +248,9 @@ export const sendAppointmentReminderNotification = inngest.createFunction(
       await step.run("send-reminder-sms", async () => {
         try {
           const datetimeObj = new Date(appointment.datetime);
-          const appointmentTime = new Intl.DateTimeFormat('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
+          const appointmentTime = new Intl.DateTimeFormat("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
             hour12: true,
           }).format(datetimeObj);
 
@@ -313,11 +301,7 @@ export const sendAppointmentCancellationNotification = inngest.createFunction(
     });
 
     if (!appointment) {
-      await updateNotificationStatus(
-        notificationId,
-        "FAILED",
-        "Appointment not found"
-      );
+      await updateNotificationStatus(notificationId, "FAILED", "Appointment not found");
       throw new Error("Appointment not found");
     }
 
@@ -328,15 +312,15 @@ export const sendAppointmentCancellationNotification = inngest.createFunction(
       await step.run("send-cancellation-sms", async () => {
         try {
           const datetimeObj = new Date(appointment.datetime);
-          const appointmentDate = new Intl.DateTimeFormat('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
+          const appointmentDate = new Intl.DateTimeFormat("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
           }).format(datetimeObj);
 
-          const appointmentTime = new Intl.DateTimeFormat('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
+          const appointmentTime = new Intl.DateTimeFormat("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
             hour12: true,
           }).format(datetimeObj);
 
@@ -387,11 +371,7 @@ export const sendAppointmentRescheduledNotification = inngest.createFunction(
     });
 
     if (!appointment) {
-      await updateNotificationStatus(
-        notificationId,
-        "FAILED",
-        "Appointment not found"
-      );
+      await updateNotificationStatus(notificationId, "FAILED", "Appointment not found");
       throw new Error("Appointment not found");
     }
 
@@ -402,15 +382,15 @@ export const sendAppointmentRescheduledNotification = inngest.createFunction(
       await step.run("send-rescheduled-sms", async () => {
         try {
           const newDatetimeObj = new Date(appointment.datetime);
-          const newDate = new Intl.DateTimeFormat('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
+          const newDate = new Intl.DateTimeFormat("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
           }).format(newDatetimeObj);
 
-          const newTime = new Intl.DateTimeFormat('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
+          const newTime = new Intl.DateTimeFormat("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
             hour12: true,
           }).format(newDatetimeObj);
 

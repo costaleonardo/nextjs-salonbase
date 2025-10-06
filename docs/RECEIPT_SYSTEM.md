@@ -48,6 +48,7 @@ The receipt generation system automatically sends professional payment receipts 
 ### Automatic Delivery
 
 Receipts are automatically sent when:
+
 - A payment is completed via `processPayment()`
 - A Stripe payment is confirmed via `confirmStripePayment()`
 
@@ -68,6 +69,7 @@ EMAIL_FROM="noreply@yourdomain.com"
 ### 2. Domain Verification
 
 For production, verify your sending domain in the Resend dashboard:
+
 1. Go to https://resend.com/domains
 2. Add your domain
 3. Configure DNS records (SPF, DKIM, DMARC)
@@ -75,6 +77,7 @@ For production, verify your sending domain in the Resend dashboard:
 ### 3. Development Mode
 
 Without `EMAIL_API_KEY`, the system operates in development mode:
+
 - Emails are logged to console instead of sent
 - Useful for local development and testing
 
@@ -83,19 +86,19 @@ Without `EMAIL_API_KEY`, the system operates in development mode:
 ### Server Actions
 
 ```typescript
-import { sendReceipt, resendReceipt } from '@/app/actions/receipts'
+import { sendReceipt, resendReceipt } from "@/app/actions/receipts";
 
 // Send receipt to client's email on file
-const result = await sendReceipt(paymentId)
+const result = await sendReceipt(paymentId);
 
 // Send receipt to specific email
-const result = await sendReceipt(paymentId, 'custom@email.com')
+const result = await sendReceipt(paymentId, "custom@email.com");
 
 // Resend receipt (e.g., client didn't receive original)
-const result = await resendReceipt(paymentId)
+const result = await resendReceipt(paymentId);
 
 // Get receipt data for preview
-const receiptData = await getReceiptData(paymentId)
+const receiptData = await getReceiptData(paymentId);
 ```
 
 ### Automatic Sending
@@ -150,6 +153,7 @@ npm run test:receipts
 ```
 
 This generates two HTML files in the project root:
+
 - `test-receipt-standard.html` - Standard receipt
 - `test-receipt-with-giftcert.html` - Receipt with gift certificate applied
 
@@ -164,10 +168,10 @@ To test actual email delivery:
 3. Call `sendReceipt()` with the payment ID:
 
 ```typescript
-import { sendReceipt } from '@/app/actions/receipts'
+import { sendReceipt } from "@/app/actions/receipts";
 
-const result = await sendReceipt('payment_id_here', 'your-test-email@example.com')
-console.log(result)
+const result = await sendReceipt("payment_id_here", "your-test-email@example.com");
+console.log(result);
 ```
 
 ### Verify Email Metadata
@@ -176,10 +180,10 @@ After sending a receipt, check the payment metadata:
 
 ```typescript
 const payment = await db.payment.findUnique({
-  where: { id: paymentId }
-})
+  where: { id: paymentId },
+});
 
-console.log(payment.metadata)
+console.log(payment.metadata);
 // Should include:
 // - receiptSent: true
 // - receiptSentAt: ISO timestamp
@@ -201,6 +205,7 @@ When a receipt is successfully sent, the payment record is updated with metadata
 ```
 
 This allows tracking:
+
 - Whether a receipt was sent
 - When it was sent
 - To which email address
@@ -216,10 +221,10 @@ Receipt send attempts are logged to `PaymentAuditLog`:
 View audit logs:
 
 ```typescript
-import { getPaymentAuditLog } from '@/app/actions/payments'
+import { getPaymentAuditLog } from "@/app/actions/payments";
 
-const logs = await getPaymentAuditLog(paymentId)
-console.log(logs.data)
+const logs = await getPaymentAuditLog(paymentId);
+console.log(logs.data);
 ```
 
 ## Troubleshooting
@@ -284,10 +289,12 @@ Optional improvements for future iterations:
 Sends receipt email to client.
 
 **Parameters:**
+
 - `paymentId` - ID of completed payment
 - `recipientEmail` - (Optional) Override client email
 
 **Returns:**
+
 ```typescript
 {
   success: boolean
@@ -309,6 +316,7 @@ Resends receipt email. Alias for `sendReceipt()`.
 Retrieves receipt data without sending email.
 
 **Returns:**
+
 ```typescript
 {
   success: boolean
@@ -329,6 +337,7 @@ Retrieves receipt data without sending email.
 ## Support
 
 For issues or questions:
+
 1. Check audit logs for error details
 2. Review Resend dashboard for delivery status
 3. Verify environment configuration

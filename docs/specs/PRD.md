@@ -1,7 +1,9 @@
 # Product Requirements Document (PRD)
+
 ## SalonBase MVP - Simple, Reliable Salon Management Software
 
 ### Document Information
+
 - **Version:** 1.0
 - **Date:** October 2025
 - **Author:** Product Team
@@ -13,7 +15,9 @@
 ## 1. Executive Summary
 
 ### Problem Statement
+
 Current salon management platforms like Fresha suffer from:
+
 - **Payment processing errors** causing incorrect charges to credit cards instead of gift certificates
 - **Mobile payment failures** requiring multiple attempts for membership signups
 - **Hidden marketplace fees** charging 20% commission without clear disclosure
@@ -21,9 +25,11 @@ Current salon management platforms like Fresha suffer from:
 - **Data lock-in** making it difficult to switch platforms
 
 ### Solution
+
 SalonBase is a streamlined salon management platform that prioritizes reliability and transparency. Built as a single Next.js application, it focuses exclusively on core booking and payment features without marketplace complications.
 
 ### Success Metrics
+
 - **Payment error rate:** < 0.1%
 - **Mobile booking completion rate:** > 95%
 - **Customer support response time:** < 2 hours
@@ -35,18 +41,21 @@ SalonBase is a streamlined salon management platform that prioritizes reliabilit
 ## 2. User Personas
 
 ### Primary: Salon Owner (Anu)
+
 - **Role:** Owner of small-to-medium salon (2-10 staff)
 - **Pain Points:** Losing money to payment errors, surprise fees, poor support
 - **Needs:** Reliable payment processing, transparent pricing, easy data migration
 - **Technical Skill:** Basic to intermediate
 
 ### Secondary: Salon Staff
+
 - **Role:** Service providers using the system daily
 - **Pain Points:** Complicated interfaces, slow systems during peak hours
 - **Needs:** Quick appointment booking, easy payment processing
 - **Technical Skill:** Basic
 
 ### Tertiary: Salon Customers
+
 - **Role:** End users booking appointments
 - **Pain Points:** Payment failures on mobile, lost gift certificates
 - **Needs:** Smooth booking experience, reliable payment processing
@@ -59,6 +68,7 @@ SalonBase is a streamlined salon management platform that prioritizes reliabilit
 ### 3.1 Appointment Management
 
 #### Basic Scheduling
+
 ```
 User Story: As a staff member, I can create, edit, and cancel appointments
 Acceptance Criteria:
@@ -69,6 +79,7 @@ Acceptance Criteria:
 ```
 
 #### Service Catalog
+
 ```
 User Story: As an owner, I can manage services and pricing
 Acceptance Criteria:
@@ -80,6 +91,7 @@ Acceptance Criteria:
 ### 3.2 Payment Processing
 
 #### Secure Payment Flow
+
 ```
 User Story: As a customer, I can pay without errors or double charges
 Acceptance Criteria:
@@ -90,6 +102,7 @@ Acceptance Criteria:
 ```
 
 #### Gift Certificate System
+
 ```
 User Story: As a staff member, I can issue and redeem gift certificates
 Acceptance Criteria:
@@ -100,6 +113,7 @@ Acceptance Criteria:
 ```
 
 **Critical Implementation Detail:**
+
 ```typescript
 // Payment source hierarchy (ENFORCED)
 1. Check for gift certificate first
@@ -111,6 +125,7 @@ Acceptance Criteria:
 ### 3.3 Membership Management
 
 #### Membership Signup (Mobile-Optimized)
+
 ```
 User Story: As a customer, I can sign up for membership on my phone
 Acceptance Criteria:
@@ -124,6 +139,7 @@ Acceptance Criteria:
 ### 3.4 Client Management
 
 #### Client Database
+
 ```
 User Story: As an owner, I can manage all client information
 Acceptance Criteria:
@@ -136,6 +152,7 @@ Acceptance Criteria:
 ### 3.5 Data Migration
 
 #### Import Tool
+
 ```
 User Story: As a new user, I can import my data from Fresha
 Acceptance Criteria:
@@ -151,6 +168,7 @@ Acceptance Criteria:
 ## 4. Technical Architecture
 
 ### 4.1 Technology Stack
+
 ```yaml
 Framework: Next.js 15 (App Router)
 Language: TypeScript
@@ -164,6 +182,7 @@ Hosting: Vercel
 ```
 
 ### 4.2 Application Structure
+
 ```
 Single Next.js Application:
 - /app/dashboard/* - Staff interface (auth required)
@@ -173,6 +192,7 @@ Single Next.js Application:
 ```
 
 ### 4.3 Database Schema (Simplified)
+
 ```sql
 Core Tables:
 - users (id, email, role, salon_id)
@@ -184,6 +204,7 @@ Core Tables:
 ```
 
 ### 4.4 Security Requirements
+
 - **Authentication:** NextAuth.js with email/password
 - **Authorization:** Role-based (owner, staff, client)
 - **Payment Security:** PCI compliance via Stripe
@@ -195,6 +216,7 @@ Core Tables:
 ## 5. User Interface Design
 
 ### 5.1 Design Principles
+
 - **Clarity Over Cleverness:** Obvious UI, no hidden features
 - **Mobile-First Booking:** Customer-facing pages optimized for phones
 - **Desktop-First Dashboard:** Staff use computers primarily
@@ -203,6 +225,7 @@ Core Tables:
 ### 5.2 Key Screens
 
 #### Dashboard Home
+
 ```
 Layout:
 ┌─────────────────────────────────┐
@@ -215,6 +238,7 @@ Layout:
 ```
 
 #### Payment Screen
+
 ```
 Payment Source Selection (EXPLICIT):
 ┌─────────────────────────────────┐
@@ -233,24 +257,28 @@ Payment Source Selection (EXPLICIT):
 ## 6. Implementation Plan
 
 ### Phase 1: Core Foundation (Weeks 1-2)
+
 - [ ] Next.js setup with authentication
 - [ ] Neon database setup and Prisma configuration
 - [ ] Basic appointment CRUD
 - [ ] Staff dashboard layout
 
 ### Phase 2: Payment System (Weeks 3-4)
+
 - [ ] Stripe integration
 - [ ] Gift certificate system
 - [ ] Payment audit logging
 - [ ] Receipt generation
 
 ### Phase 3: Client Features (Weeks 5-6)
+
 - [ ] Public booking widget
 - [ ] Mobile optimization
 - [ ] Membership system
 - [ ] Client portal
 
 ### Phase 4: Migration & Polish (Weeks 7-8)
+
 - [ ] Data import tool
 - [ ] Email/SMS notifications
 - [ ] Error handling improvements
@@ -261,6 +289,7 @@ Payment Source Selection (EXPLICIT):
 ## 7. Success Criteria
 
 ### Launch Requirements (Must Have)
+
 - ✅ Zero payment processing errors in testing
 - ✅ Mobile booking works on iOS/Android
 - ✅ Gift certificates never charge wrong source
@@ -268,6 +297,7 @@ Payment Source Selection (EXPLICIT):
 - ✅ Under 500ms response time
 
 ### Post-Launch Success Metrics (Week 4)
+
 - 10 active salons
 - < 0.1% payment error rate
 - > 95% mobile completion rate
@@ -279,18 +309,20 @@ Payment Source Selection (EXPLICIT):
 ## 8. Risks & Mitigations
 
 ### Technical Risks
-| Risk | Probability | Impact | Mitigation |
-|------|------------|--------|------------|
-| Payment processing bugs | Medium | High | Extensive testing, audit logs |
-| Data migration errors | Medium | High | Preview mode, rollback capability |
-| Mobile browser issues | High | Medium | Progressive enhancement, fallbacks |
+
+| Risk                    | Probability | Impact | Mitigation                         |
+| ----------------------- | ----------- | ------ | ---------------------------------- |
+| Payment processing bugs | Medium      | High   | Extensive testing, audit logs      |
+| Data migration errors   | Medium      | High   | Preview mode, rollback capability  |
+| Mobile browser issues   | High        | Medium | Progressive enhancement, fallbacks |
 
 ### Business Risks
-| Risk | Probability | Impact | Mitigation |
-|------|------------|--------|------------|
-| Slow adoption | Medium | High | Free migration service |
-| Fresha retaliation | Low | Medium | Focus on underserved segments |
-| Support overwhelm | Medium | Medium | Excellent documentation, video guides |
+
+| Risk               | Probability | Impact | Mitigation                            |
+| ------------------ | ----------- | ------ | ------------------------------------- |
+| Slow adoption      | Medium      | High   | Free migration service                |
+| Fresha retaliation | Low         | Medium | Focus on underserved segments         |
+| Support overwhelm  | Medium      | Medium | Excellent documentation, video guides |
 
 ---
 
@@ -310,6 +342,7 @@ Payment Source Selection (EXPLICIT):
 ## 10. Pricing Strategy
 
 ### Simple, Transparent Pricing
+
 ```
 Base Plan:
 - $5 per staff member per month
@@ -328,16 +361,19 @@ Pioneer Discount:
 ## 11. Launch Strategy
 
 ### Week 1: Soft Launch
+
 - 5 beta salons (personal network)
 - Daily check-ins
 - Rapid bug fixes
 
 ### Week 2-4: Controlled Growth
+
 - 25 salons target
 - Focus on migration success
 - Collect testimonials
 
 ### Month 2: Public Launch
+
 - ProductHunt launch
 - Direct outreach to Fresha users
 - Referral program activation
@@ -347,6 +383,7 @@ Pioneer Discount:
 ## 12. Appendix
 
 ### A. Payment Flow Diagram
+
 ```mermaid
 graph TD
     A[Customer Checkout] --> B{Gift Certificate?}
@@ -360,6 +397,7 @@ graph TD
 ```
 
 ### B. Migration Checklist
+
 - [ ] Export data from Fresha
 - [ ] Validate CSV format
 - [ ] Run import preview
@@ -369,10 +407,11 @@ graph TD
 - [ ] Verify in dashboard
 
 ### C. Contact
+
 - **Product Owner:** [Email]
 - **Technical Lead:** [Email]
 - **Design Lead:** [Email]
 
 ---
 
-*This document represents the Minimum Viable Product. Features will be added based on user feedback and business priorities.*
+_This document represents the Minimum Viable Product. Features will be added based on user feedback and business priorities._

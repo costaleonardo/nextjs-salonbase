@@ -6,10 +6,10 @@
  */
 
 interface AppointmentConfirmationSMSParams {
-  salonName: string
-  serviceName: string
-  appointmentDate: string
-  appointmentTime: string
+  salonName: string;
+  serviceName: string;
+  appointmentDate: string;
+  appointmentTime: string;
 }
 
 export function appointmentConfirmationSMS({
@@ -18,13 +18,13 @@ export function appointmentConfirmationSMS({
   appointmentDate,
   appointmentTime,
 }: AppointmentConfirmationSMSParams): string {
-  return `${salonName}: Your ${serviceName} appointment is confirmed for ${appointmentDate} at ${appointmentTime}. See you soon!`
+  return `${salonName}: Your ${serviceName} appointment is confirmed for ${appointmentDate} at ${appointmentTime}. See you soon!`;
 }
 
 interface AppointmentReminderSMSParams {
-  salonName: string
-  serviceName: string
-  appointmentTime: string
+  salonName: string;
+  serviceName: string;
+  appointmentTime: string;
 }
 
 export function appointmentReminderSMS({
@@ -32,13 +32,13 @@ export function appointmentReminderSMS({
   serviceName,
   appointmentTime,
 }: AppointmentReminderSMSParams): string {
-  return `Reminder: You have a ${serviceName} appointment tomorrow at ${appointmentTime} with ${salonName}. Reply CANCEL if you need to reschedule.`
+  return `Reminder: You have a ${serviceName} appointment tomorrow at ${appointmentTime} with ${salonName}. Reply CANCEL if you need to reschedule.`;
 }
 
 interface AppointmentCancellationSMSParams {
-  salonName: string
-  appointmentDate: string
-  appointmentTime: string
+  salonName: string;
+  appointmentDate: string;
+  appointmentTime: string;
 }
 
 export function appointmentCancellationSMS({
@@ -46,14 +46,14 @@ export function appointmentCancellationSMS({
   appointmentDate,
   appointmentTime,
 }: AppointmentCancellationSMSParams): string {
-  return `${salonName}: Your appointment on ${appointmentDate} at ${appointmentTime} has been cancelled.`
+  return `${salonName}: Your appointment on ${appointmentDate} at ${appointmentTime} has been cancelled.`;
 }
 
 interface AppointmentRescheduledSMSParams {
-  salonName: string
-  serviceName: string
-  newDate: string
-  newTime: string
+  salonName: string;
+  serviceName: string;
+  newDate: string;
+  newTime: string;
 }
 
 export function appointmentRescheduledSMS({
@@ -62,13 +62,13 @@ export function appointmentRescheduledSMS({
   newDate,
   newTime,
 }: AppointmentRescheduledSMSParams): string {
-  return `${salonName}: Your ${serviceName} appointment has been rescheduled to ${newDate} at ${newTime}.`
+  return `${salonName}: Your ${serviceName} appointment has been rescheduled to ${newDate} at ${newTime}.`;
 }
 
 interface PaymentReceiptSMSParams {
-  salonName: string
-  amount: string
-  paymentMethod: string
+  salonName: string;
+  amount: string;
+  paymentMethod: string;
 }
 
 export function paymentReceiptSMS({
@@ -76,5 +76,5 @@ export function paymentReceiptSMS({
   amount,
   paymentMethod,
 }: PaymentReceiptSMSParams): string {
-  return `${salonName}: Payment of $${amount} received via ${paymentMethod}. Thank you!`
+  return `${salonName}: Payment of $${amount} received via ${paymentMethod}. Thank you!`;
 }

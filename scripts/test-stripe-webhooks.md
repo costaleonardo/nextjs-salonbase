@@ -5,6 +5,7 @@ This guide explains how to test Stripe webhooks locally using the Stripe CLI.
 ## Prerequisites
 
 1. Install Stripe CLI: https://stripe.com/docs/stripe-cli
+
    ```bash
    # macOS
    brew install stripe/stripe-cli/stripe
@@ -67,6 +68,7 @@ stripe trigger charge.refunded
 ### 5. Verify webhook handling
 
 Check your terminal logs for:
+
 - `[Stripe Webhook] Received event: payment_intent.succeeded`
 - `[Stripe Webhook] Payment X marked as COMPLETED`
 - Database updates in Prisma Studio
@@ -140,16 +142,19 @@ Or add via Vercel dashboard: Settings → Environment Variables
 ## Expected Behavior
 
 ### payment_intent.succeeded
+
 - Payment status: `PENDING` → `COMPLETED`
 - Audit log created with action: `payment_succeeded`
 - Metadata updated with completion timestamp
 
 ### payment_intent.payment_failed
+
 - Payment status: `PENDING` → `FAILED`
 - Audit log created with action: `payment_failed`
 - Error details stored in metadata
 
 ### charge.refunded
+
 - Payment status: `COMPLETED` → `REFUNDED`
 - Audit log created with action: `payment_refunded`
 - Refunded amount stored in metadata

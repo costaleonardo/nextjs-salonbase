@@ -4,11 +4,11 @@
  */
 
 type RetryOptions = {
-  maxRetries?: number
-  delayMs?: number
-  backoffMultiplier?: number
-  onRetry?: (attempt: number, error: Error) => void
-}
+  maxRetries?: number;
+  delayMs?: number;
+  backoffMultiplier?: number;
+  onRetry?: (attempt: number, error: Error) => void;
+};
 
 /**
  * Executes an async function with exponential backoff retry logic
@@ -21,55 +21,50 @@ export async function fetchWithRetry<T>(
   fn: () => Promise<T>,
   options: RetryOptions = {}
 ): Promise<T> {
-  const {
-    maxRetries = 3,
-    delayMs = 1000,
-    backoffMultiplier = 2,
-    onRetry,
-  } = options
+  const { maxRetries = 3, delayMs = 1000, backoffMultiplier = 2, onRetry } = options;
 
-  let lastError: Error
+  let lastError: Error;
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      return await fn()
+      return await fn();
     } catch (error) {
-      lastError = error instanceof Error ? error : new Error('Unknown error')
+      lastError = error instanceof Error ? error : new Error("Unknown error");
 
       // Don't retry on the last attempt
       if (attempt === maxRetries - 1) {
-        throw lastError
+        throw lastError;
       }
 
       // Call onRetry callback if provided
       if (onRetry) {
-        onRetry(attempt + 1, lastError)
+        onRetry(attempt + 1, lastError);
       }
 
       // Calculate delay with exponential backoff
-      const delay = delayMs * Math.pow(backoffMultiplier, attempt)
+      const delay = delayMs * Math.pow(backoffMultiplier, attempt);
 
       // Wait before retrying
-      await new Promise((resolve) => setTimeout(resolve, delay))
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
 
-  throw lastError!
+  throw lastError!;
 }
 
 /**
  * Checks if an error is a network error that should be retried
  */
 export function isRetryableError(error: unknown): boolean {
-  if (!(error instanceof Error)) return false
+  if (!(error instanceof Error)) return false;
 
-  const message = error.message.toLowerCase()
+  const message = error.message.toLowerCase();
   return (
-    message.includes('network') ||
-    message.includes('fetch') ||
-    message.includes('timeout') ||
-    message.includes('connection')
-  )
+    message.includes("network") ||
+    message.includes("fetch") ||
+    message.includes("timeout") ||
+    message.includes("connection")
+  );
 }
 
 /**
@@ -86,12 +81,12 @@ export async function serverActionWithRetry<T>(
       delayMs: options.delayMs || 500,
       backoffMultiplier: options.backoffMultiplier || 1.5,
       onRetry: options.onRetry,
-    })
+    });
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'An unexpected error occurred',
-    }
+      error: error instanceof Error ? error.message : "An unexpected error occurred",
+    };
   }
 }
 
@@ -103,37 +98,34 @@ export async function serverActionWithRetry<T>(
  * })
  */
 export function useRetryState() {
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [error, setError] = React.useState<string | null>(null)
-  const [retryCount, setRetryCount] = React.useState(0)
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const [retryCount, setRetryCount] = React.useState(0);
 
-  const execute = async <T,>(
-    fn: () => Promise<T>,
-    options?: RetryOptions
-  ): Promise<T | null> => {
-    setIsLoading(true)
-    setError(null)
-    setRetryCount(0)
+  const execute = async <T>(fn: () => Promise<T>, options?: RetryOptions): Promise<T | null> => {
+    setIsLoading(true);
+    setError(null);
+    setRetryCount(0);
 
     try {
       const result = await fetchWithRetry(fn, {
         ...options,
         onRetry: (attempt) => {
-          setRetryCount(attempt)
-          options?.onRetry?.(attempt, new Error('Retrying...'))
+          setRetryCount(attempt);
+          options?.onRetry?.(attempt, new Error("Retrying..."));
         },
-      })
-      setIsLoading(false)
-      return result
+      });
+      setIsLoading(false);
+      return result;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
-      setIsLoading(false)
-      return null
+      setError(err instanceof Error ? err.message : "An error occurred");
+      setIsLoading(false);
+      return null;
     }
-  }
+  };
 
-  return { execute, isLoading, error, retryCount }
+  return { execute, isLoading, error, retryCount };
 }
 
 // React import for the hook
-import React from 'react'
+import React from "react";

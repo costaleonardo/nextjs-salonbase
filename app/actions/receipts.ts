@@ -1,26 +1,26 @@
-'use server'
+"use server";
 
-import { auth } from '@/lib/auth'
-import { db } from '@/lib/db'
-import { sendEmailFromComponent } from '@/lib/email'
-import ReceiptEmail, { ReceiptEmailData } from '@/lib/email-templates/receipt'
-import { PaymentMethod } from '@prisma/client'
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { sendEmailFromComponent } from "@/lib/email";
+import ReceiptEmail, { ReceiptEmailData } from "@/lib/email-templates/receipt";
+import { PaymentMethod } from "@prisma/client";
 
 /**
  * Format payment method for display in receipt
  */
 function formatPaymentMethod(method: PaymentMethod): string {
   switch (method) {
-    case 'CREDIT_CARD':
-      return 'Credit Card'
-    case 'GIFT_CERTIFICATE':
-      return 'Gift Certificate'
-    case 'CASH':
-      return 'Cash'
-    case 'OTHER':
-      return 'Other'
+    case "CREDIT_CARD":
+      return "Credit Card";
+    case "GIFT_CERTIFICATE":
+      return "Gift Certificate";
+    case "CASH":
+      return "Cash";
+    case "OTHER":
+      return "Other";
     default:
-      return method
+      return method;
   }
 }
 
@@ -28,22 +28,22 @@ function formatPaymentMethod(method: PaymentMethod): string {
  * Format date for receipt display
  */
 function formatReceiptDate(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(date)
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(date);
 }
 
 /**
  * Format time for receipt display
  */
 function formatReceiptTime(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
     hour12: true,
-  }).format(date)
+  }).format(date);
 }
 
 /**
@@ -51,18 +51,18 @@ function formatReceiptTime(date: Date): string {
  * Format: RCPT-YYYYMMDD-XXXXX (last 5 chars of payment ID)
  */
 function generateReceiptNumber(paymentId: string, createdAt: Date): string {
-  const dateStr = createdAt.toISOString().slice(0, 10).replace(/-/g, '')
-  const shortId = paymentId.slice(-5).toUpperCase()
-  return `RCPT-${dateStr}-${shortId}`
+  const dateStr = createdAt.toISOString().slice(0, 10).replace(/-/g, "");
+  const shortId = paymentId.slice(-5).toUpperCase();
+  return `RCPT-${dateStr}-${shortId}`;
 }
 
 /**
  * Prepare receipt data from payment record
  */
 async function prepareReceiptData(paymentId: string): Promise<{
-  success: boolean
-  data?: ReceiptEmailData
-  error?: string
+  success: boolean;
+  data?: ReceiptEmailData;
+  error?: string;
 }> {
   try {
     const payment = await db.payment.findUnique({
@@ -77,16 +77,16 @@ async function prepareReceiptData(paymentId: string): Promise<{
           },
         },
       },
-    })
+    });
 
     if (!payment) {
-      return { success: false, error: 'Payment not found' }
+      return { success: false, error: "Payment not found" };
     }
 
-    const { appointment } = payment
+    const { appointment } = payment;
     const metadata = payment.metadata as {
-      giftCertificateApplied?: number
-    } | null
+      giftCertificateApplied?: number;
+    } | null;
 
     const receiptData: ReceiptEmailData = {
       salonName: appointment.salon.name,
@@ -107,15 +107,15 @@ async function prepareReceiptData(paymentId: string): Promise<{
       giftCertificateApplied: metadata?.giftCertificateApplied
         ? Number(metadata.giftCertificateApplied)
         : undefined,
-    }
+    };
 
-    return { success: true, data: receiptData }
+    return { success: true, data: receiptData };
   } catch (error) {
-    console.error('Error preparing receipt data:', error)
+    console.error("Error preparing receipt data:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to prepare receipt data',
-    }
+      error: error instanceof Error ? error.message : "Failed to prepare receipt data",
+    };
   }
 }
 
@@ -124,9 +124,9 @@ async function prepareReceiptData(paymentId: string): Promise<{
  */
 export async function sendReceipt(paymentId: string, recipientEmail?: string) {
   try {
-    const session = await auth()
+    const session = await auth();
     if (!session?.user?.salonId) {
-      return { success: false, error: 'Unauthorized' }
+      return { success: false, error: "Unauthorized" };
     }
 
     // Verify payment belongs to user's salon
@@ -144,33 +144,33 @@ export async function sendReceipt(paymentId: string, recipientEmail?: string) {
           },
         },
       },
-    })
+    });
 
     if (!payment) {
-      return { success: false, error: 'Payment not found' }
+      return { success: false, error: "Payment not found" };
     }
 
-    if (payment.status !== 'COMPLETED') {
-      return { success: false, error: 'Can only send receipts for completed payments' }
+    if (payment.status !== "COMPLETED") {
+      return { success: false, error: "Can only send receipts for completed payments" };
     }
 
     // Determine recipient email
-    const toEmail = recipientEmail || payment.appointment.client.email
+    const toEmail = recipientEmail || payment.appointment.client.email;
 
     if (!toEmail) {
       return {
         success: false,
-        error: 'Client email not found. Please provide a recipient email.',
-      }
+        error: "Client email not found. Please provide a recipient email.",
+      };
     }
 
     // Prepare receipt data
-    const receiptDataResult = await prepareReceiptData(paymentId)
+    const receiptDataResult = await prepareReceiptData(paymentId);
     if (!receiptDataResult.success || !receiptDataResult.data) {
       return {
         success: false,
-        error: receiptDataResult.error || 'Failed to prepare receipt',
-      }
+        error: receiptDataResult.error || "Failed to prepare receipt",
+      };
     }
 
     // Send email
@@ -178,18 +178,18 @@ export async function sendReceipt(paymentId: string, recipientEmail?: string) {
       to: toEmail,
       subject: `Payment Receipt - ${receiptDataResult.data.salonName}`,
       component: ReceiptEmail(receiptDataResult.data),
-    })
+    });
 
     if (!emailResult.success) {
       return {
         success: false,
-        error: emailResult.error || 'Failed to send receipt email',
-      }
+        error: emailResult.error || "Failed to send receipt email",
+      };
     }
 
     // Update payment metadata with receipt sent information
-    const currentMetadata = (payment.metadata as Record<string, any>) || {}
-    const emailId = emailResult.data && 'id' in emailResult.data ? emailResult.data.id : undefined
+    const currentMetadata = (payment.metadata as Record<string, any>) || {};
+    const emailId = emailResult.data && "id" in emailResult.data ? emailResult.data.id : undefined;
     await db.payment.update({
       where: { id: paymentId },
       data: {
@@ -201,7 +201,7 @@ export async function sendReceipt(paymentId: string, recipientEmail?: string) {
           receiptEmailId: emailId,
         },
       },
-    })
+    });
 
     return {
       success: true,
@@ -210,13 +210,13 @@ export async function sendReceipt(paymentId: string, recipientEmail?: string) {
         sentTo: toEmail,
         emailId,
       },
-    }
+    };
   } catch (error) {
-    console.error('Error sending receipt:', error)
+    console.error("Error sending receipt:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to send receipt',
-    }
+      error: error instanceof Error ? error.message : "Failed to send receipt",
+    };
   }
 }
 
@@ -225,7 +225,7 @@ export async function sendReceipt(paymentId: string, recipientEmail?: string) {
  * Allows staff to resend a receipt to the same or different email
  */
 export async function resendReceipt(paymentId: string, recipientEmail?: string) {
-  return sendReceipt(paymentId, recipientEmail)
+  return sendReceipt(paymentId, recipientEmail);
 }
 
 /**
@@ -233,9 +233,9 @@ export async function resendReceipt(paymentId: string, recipientEmail?: string) 
  */
 export async function getReceiptData(paymentId: string) {
   try {
-    const session = await auth()
+    const session = await auth();
     if (!session?.user?.salonId) {
-      return { success: false, error: 'Unauthorized' }
+      return { success: false, error: "Unauthorized" };
     }
 
     // Verify payment belongs to user's salon
@@ -246,18 +246,18 @@ export async function getReceiptData(paymentId: string) {
           salonId: session.user.salonId,
         },
       },
-    })
+    });
 
     if (!payment) {
-      return { success: false, error: 'Payment not found' }
+      return { success: false, error: "Payment not found" };
     }
 
-    return await prepareReceiptData(paymentId)
+    return await prepareReceiptData(paymentId);
   } catch (error) {
-    console.error('Error getting receipt data:', error)
+    console.error("Error getting receipt data:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to get receipt data',
-    }
+      error: error instanceof Error ? error.message : "Failed to get receipt data",
+    };
   }
 }

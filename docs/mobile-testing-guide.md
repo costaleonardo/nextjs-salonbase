@@ -1,6 +1,7 @@
 # Mobile Testing Guide
 
 ## Overview
+
 This guide provides step-by-step instructions for testing the SalonBase MVP on mobile devices to ensure >95% completion rate.
 
 ---
@@ -8,11 +9,13 @@ This guide provides step-by-step instructions for testing the SalonBase MVP on m
 ## Pre-Testing Setup
 
 ### Required Devices
+
 - iPhone (iOS 15+): iPhone SE, iPhone 12/13/14
 - Android (Chrome 100+): Pixel, Samsung Galaxy, OnePlus
 - iPad (optional): iPad Mini or iPad Air
 
 ### Required Tools
+
 1. **Chrome DevTools** - For desktop simulation and throttling
 2. **BrowserStack/Sauce Labs** (optional) - For real device testing
 3. **Lighthouse** - For performance audits
@@ -25,6 +28,7 @@ This guide provides step-by-step instructions for testing the SalonBase MVP on m
 ### Scenario 1: Happy Path - Complete Booking Flow
 
 #### iOS Safari Testing
+
 1. Open Safari on iPhone
 2. Navigate to booking widget: `https://[your-domain]/book/[salon-slug]`
 3. **Service Selection**:
@@ -58,7 +62,9 @@ This guide provides step-by-step instructions for testing the SalonBase MVP on m
 **Expected Result**: 100% completion with no errors
 
 #### Android Chrome Testing
+
 Repeat the same steps as iOS Safari testing. Additionally:
+
 - [ ] Verify autofill works with Google account
 - [ ] Test back button behavior
 - [ ] Verify no visual glitches or layout shifts
@@ -109,12 +115,14 @@ Repeat the same steps as iOS Safari testing. Additionally:
 ### Scenario 4: Slow Network (3G Simulation)
 
 **Chrome DevTools Setup**:
+
 1. Open DevTools (F12)
 2. Go to Network tab
 3. Set throttling to "Slow 3G"
 4. Enable "Disable cache"
 
 **Test Steps**:
+
 1. Start booking flow
 2. **Verify loading states**:
    - [ ] Skeleton loaders appear (not just spinners)
@@ -156,6 +164,7 @@ Repeat the same steps as iOS Safari testing. Additionally:
 ### Scenario 6: Touch Target Testing
 
 Use a tool to measure touch target sizes:
+
 1. **Inspect all interactive elements**:
    - [ ] Service selection buttons ≥ 44x44px
    - [ ] Staff selection buttons ≥ 44x44px
@@ -179,6 +188,7 @@ Use a tool to measure touch target sizes:
 Test on different screen sizes:
 
 #### iPhone SE (320px width)
+
 - [ ] All content is visible (no horizontal scroll)
 - [ ] Text is readable without zooming
 - [ ] Buttons are not cut off
@@ -186,11 +196,13 @@ Test on different screen sizes:
 - [ ] Date scroll works smoothly
 
 #### Standard Phone (375-414px width)
+
 - [ ] Layout looks balanced
 - [ ] Grid layouts work correctly (3 columns for time slots)
 - [ ] All spacing looks appropriate
 
 #### Tablet (768px width)
+
 - [ ] Layout adapts to wider screen
 - [ ] Grid shows 4 columns for time slots (sm:grid-cols-4)
 - [ ] Padding increases (sm:p-6)
@@ -264,6 +276,7 @@ Test on different screen sizes:
 5. Run audit
 
 **Target Scores**:
+
 - [ ] Performance: ≥ 90
 - [ ] Accessibility: ≥ 95
 - [ ] Best Practices: ≥ 90
@@ -272,6 +285,7 @@ Test on different screen sizes:
 ### Core Web Vitals
 
 **Targets**:
+
 - [ ] Largest Contentful Paint (LCP): < 2.5s
 - [ ] First Input Delay (FID): < 100ms
 - [ ] Cumulative Layout Shift (CLS): < 0.1
@@ -333,6 +347,7 @@ Test on different screen sizes:
 ### Metrics to Track
 
 **Setup Google Analytics or Posthog**:
+
 1. Track events:
    - `booking_started`: When service is selected
    - `booking_staff_selected`: Staff selection completed
@@ -342,6 +357,7 @@ Test on different screen sizes:
    - `booking_error`: Any error occurred
 
 2. **Calculate completion rate**:
+
    ```
    Completion Rate = (booking_confirmed / booking_started) * 100
    ```
@@ -351,12 +367,14 @@ Test on different screen sizes:
 ### Drop-off Analysis
 
 If completion rate < 95%, identify drop-off points:
+
 - [ ] Service selection → Staff (expected: 5% drop-off)
 - [ ] Staff → Date/time (expected: 5% drop-off)
 - [ ] Date/time → Client info (expected: 10% drop-off)
 - [ ] Client info → Confirmed (expected: 5% drop-off)
 
 **Investigation**: If drop-off > expected at any step, investigate:
+
 - Network errors in console
 - Validation issues
 - UI/UX confusion
@@ -375,6 +393,7 @@ When reporting mobile issues, include:
 **Scenario**: [Complete booking flow]
 
 **Steps to Reproduce**:
+
 1. Step 1
 2. Step 2
 3. Step 3
@@ -399,8 +418,9 @@ When reporting mobile issues, include:
 ## Testing Checklist Summary
 
 Before launch, verify:
-- [  ] All 10 scenarios tested on iOS Safari
-- [  ] All 10 scenarios tested on Android Chrome
+
+- [ ] All 10 scenarios tested on iOS Safari
+- [ ] All 10 scenarios tested on Android Chrome
 - [ ] Lighthouse mobile score ≥ 90
 - [ ] All touch targets ≥ 44x44px
 - [ ] Autofill works on all forms

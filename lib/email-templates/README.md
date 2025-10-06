@@ -9,6 +9,7 @@ This directory contains React-based email templates for transactional emails.
 Professional payment receipt template sent to clients after successful payment.
 
 **Features:**
+
 - Clean, professional design
 - Mobile-responsive layout
 - Displays salon information
@@ -20,13 +21,13 @@ Professional payment receipt template sent to clients after successful payment.
 **Usage:**
 
 ```typescript
-import { sendReceipt } from '@/app/actions/receipts'
+import { sendReceipt } from "@/app/actions/receipts";
 
 // Send receipt after payment completion
-await sendReceipt(paymentId)
+await sendReceipt(paymentId);
 
 // Or send to a specific email
-await sendReceipt(paymentId, 'client@example.com')
+await sendReceipt(paymentId, "client@example.com");
 ```
 
 ## Email Service Setup
@@ -55,18 +56,18 @@ In development mode without `EMAIL_API_KEY`, emails will be logged to console in
 To preview email templates during development:
 
 ```typescript
-import { renderEmailToHtml } from '@/lib/email'
-import ReceiptEmail from '@/lib/email-templates/receipt'
+import { renderEmailToHtml } from "@/lib/email";
+import ReceiptEmail from "@/lib/email-templates/receipt";
 
 const html = renderEmailToHtml(
   ReceiptEmail({
-    salonName: 'Test Salon',
-    clientName: 'John Doe',
+    salonName: "Test Salon",
+    clientName: "John Doe",
     // ... other props
   })
-)
+);
 
-console.log(html) // Or save to file for preview
+console.log(html); // Or save to file for preview
 ```
 
 ## Adding New Templates
@@ -81,7 +82,7 @@ console.log(html) // Or save to file for preview
 
 ```tsx
 export interface MyEmailData {
-  recipientName: string
+  recipientName: string;
   // ... other props
 }
 
@@ -92,13 +93,13 @@ export const MyEmail = ({ recipientName }: MyEmailData) => {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body style={{ fontFamily: 'sans-serif' }}>
+      <body style={{ fontFamily: "sans-serif" }}>
         <h1>Hello {recipientName}</h1>
         {/* ... */}
       </body>
     </html>
-  )
-}
+  );
+};
 ```
 
 ## Email Best Practices

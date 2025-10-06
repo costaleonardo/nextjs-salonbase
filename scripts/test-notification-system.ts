@@ -8,10 +8,7 @@
  */
 
 import { db } from "@/lib/db";
-import {
-  scheduleAppointmentConfirmation,
-  scheduleAppointmentReminder,
-} from "@/lib/notifications";
+import { scheduleAppointmentConfirmation, scheduleAppointmentReminder } from "@/lib/notifications";
 
 async function main() {
   console.log("🧪 Testing Notification System\n");
@@ -44,8 +41,12 @@ async function main() {
 
     // 2. Check notification preferences
     console.log("2. Checking notification preferences...");
-    console.log(`   Email notifications: ${appointment.client.emailNotificationsEnabled ? "✅ Enabled" : "❌ Disabled"}`);
-    console.log(`   SMS notifications: ${appointment.client.smsNotificationsEnabled ? "✅ Enabled" : "❌ Disabled"}`);
+    console.log(
+      `   Email notifications: ${appointment.client.emailNotificationsEnabled ? "✅ Enabled" : "❌ Disabled"}`
+    );
+    console.log(
+      `   SMS notifications: ${appointment.client.smsNotificationsEnabled ? "✅ Enabled" : "❌ Disabled"}`
+    );
     console.log();
 
     // 3. Test scheduling confirmation notification
@@ -65,10 +66,7 @@ async function main() {
     // 4. Test scheduling reminder notification
     console.log("4. Testing reminder notification...");
     try {
-      const reminder = await scheduleAppointmentReminder(
-        appointment.id,
-        appointment.datetime
-      );
+      const reminder = await scheduleAppointmentReminder(appointment.id, appointment.datetime);
       if (reminder) {
         console.log(`✅ Reminder notification created: ${reminder.id}`);
         console.log(`   Type: ${reminder.type}`);
@@ -105,14 +103,22 @@ async function main() {
 
     // 6. Test unsubscribe mechanism
     console.log("6. Testing unsubscribe mechanism...");
-    console.log(`   Unsubscribe URL for email: /api/unsubscribe?clientId=${appointment.client.id}&type=email`);
-    console.log(`   Unsubscribe URL for SMS: /api/unsubscribe?clientId=${appointment.client.id}&type=sms`);
+    console.log(
+      `   Unsubscribe URL for email: /api/unsubscribe?clientId=${appointment.client.id}&type=email`
+    );
+    console.log(
+      `   Unsubscribe URL for SMS: /api/unsubscribe?clientId=${appointment.client.id}&type=sms`
+    );
     console.log();
 
     console.log("✅ Notification system test completed!\n");
     console.log("📝 Next steps:");
-    console.log("1. Set up Inngest account and add INNGEST_EVENT_KEY and INNGEST_SIGNING_KEY to .env.local");
-    console.log("2. Run `npm run dev` and visit http://localhost:3000/api/inngest to register functions");
+    console.log(
+      "1. Set up Inngest account and add INNGEST_EVENT_KEY and INNGEST_SIGNING_KEY to .env.local"
+    );
+    console.log(
+      "2. Run `npm run dev` and visit http://localhost:3000/api/inngest to register functions"
+    );
     console.log("3. Test creating a new appointment to trigger notifications");
     console.log("4. Check Inngest dashboard to see event flow");
     console.log();

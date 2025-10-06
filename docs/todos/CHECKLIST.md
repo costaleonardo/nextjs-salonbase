@@ -8,6 +8,7 @@
 ## Phase 1: Core Foundation (Weeks 1-2)
 
 ### Project Setup & Infrastructure
+
 - [x] Initialize Next.js 15 project with App Router
 - [x] Configure TypeScript with strict mode
 - [x] Set up ESLint and Prettier
@@ -17,6 +18,7 @@
 - [x] Set up Vercel deployment pipeline
 
 ### Database Setup (Neon PostgreSQL)
+
 - [x] Create Neon account and project
 - [x] Provision production database (Pro plan - $19/month)
 - [x] Provision development database (Free tier or branch)
@@ -28,6 +30,7 @@
 - [ ] Set up database branching workflow
 
 ### Prisma ORM Setup
+
 - [x] Install Prisma dependencies (@prisma/client, @neondatabase/serverless, @prisma/adapter-neon)
 - [x] Create prisma/schema.prisma with datasource configuration
 - [x] Implement lib/db.ts with Neon adapter and connection pooling
@@ -35,6 +38,7 @@
 - [x] Set up migration scripts in package.json
 
 ### Database Schema - Core Models
+
 - [x] Create User model (id, email, role, salonId, timestamps)
 - [x] Add User indexes (salonId, email)
 - [x] Create Role enum (OWNER, STAFF, CLIENT)
@@ -50,6 +54,7 @@
 - [x] Test schema with basic queries
 
 ### Authentication (NextAuth.js)
+
 - [x] Install next-auth and dependencies
 - [x] Create /app/api/auth/[...nextauth]/route.ts
 - [x] Configure email/password authentication provider
@@ -63,6 +68,7 @@
 - [x] Configure session persistence
 
 ### Basic Appointment Management
+
 - [x] Create Appointment Server Actions (/app/actions/appointments.ts)
   - [x] createAppointment action
   - [x] updateAppointment action
@@ -73,6 +79,7 @@
 - [x] Add error handling and rollback for failed operations
 
 ### Staff Dashboard Layout
+
 - [x] Create dashboard layout component (/app/dashboard/layout.tsx)
 - [x] Implement navigation menu (Appointments, Clients, Services, Payments)
 - [x] Create responsive sidebar for desktop
@@ -82,6 +89,7 @@
 - [x] Test accessibility (WCAG 2.1 AA)
 
 ### Dashboard - Appointments View
+
 - [x] Create /app/dashboard/appointments page
 - [x] Implement daily calendar view component
 - [x] Implement weekly calendar view component
@@ -100,6 +108,7 @@
 ## Phase 2: Payment System (Weeks 3-4)
 
 ### Stripe Integration Setup
+
 - [x] Create Stripe account (test mode)
 - [x] Install stripe and @stripe/stripe-js packages
 - [x] Set up Stripe API keys in environment variables
@@ -108,6 +117,7 @@
 - [x] Test Stripe connection in development
 
 ### Payment Schema
+
 - [x] Create PaymentMethod enum (CREDIT_CARD, GIFT_CERTIFICATE, CASH, OTHER)
 - [x] Create PaymentStatus enum (PENDING, COMPLETED, FAILED, REFUNDED)
 - [x] Create Payment model (id, appointmentId, amount, method, stripePaymentId, status, createdAt)
@@ -118,6 +128,7 @@
 - [x] Run migration: `prisma migrate dev --name add_payments`
 
 ### Gift Certificate System
+
 - [x] Create GiftCertificate model (id, code, balance, originalAmount, salonId, clientId, createdAt, expiresAt)
 - [x] Add GiftCertificate indexes (code, salonId)
 - [x] Run migration: `prisma migrate dev --name add_gift_certificates`
@@ -130,6 +141,7 @@
 - [x] Test certificate deduplication
 
 ### Payment Processing - CRITICAL IMPLEMENTATION
+
 - [x] Create payment source selection component with EXPLICIT UI
   - [x] Radio buttons for payment source (Gift Certificate, Credit Card, Cash, Other)
   - [x] Show gift certificate balance prominently
@@ -150,6 +162,7 @@
 - [x] **Verify gift certificates NEVER accidentally charge credit cards**
 
 ### Stripe Payment Flow
+
 - [x] Create Stripe Payment Intent creation endpoint
 - [x] Implement Stripe Elements for card input (mobile-optimized)
 - [x] Create payment confirmation UI
@@ -161,6 +174,7 @@
 - [x] Test with various card types (US, international)
 
 ### Stripe Webhooks
+
 - [x] Create /app/api/webhooks/stripe route
 - [x] Implement webhook signature verification
 - [x] Handle payment_intent.succeeded event
@@ -172,6 +186,7 @@
 - [ ] Set up webhook endpoint in Stripe dashboard
 
 ### Payment Audit Logging
+
 - [x] Create audit logging utility function
 - [x] Log payment source selection
 - [x] Log payment attempt (method, amount, timestamp)
@@ -182,6 +197,7 @@
 - [x] Test audit trail completeness
 
 ### Receipt Generation
+
 - [x] Design receipt email template
 - [ ] Create receipt PDF generator (optional)
 - [x] Implement receipt data formatting
@@ -196,6 +212,7 @@
 ## Phase 3: Client Features (Weeks 5-6)
 
 ### Email/SMS Notification Setup
+
 - [x] Choose email provider (Resend, SendGrid, or similar)
 - [x] Set up email provider account and API keys
 - [x] Install email provider SDK
@@ -207,6 +224,7 @@
 - [x] Create notification templates folder
 
 ### Notification System
+
 - [x] Create Notification model (id, type, recipient, status, scheduledAt, sentAt)
 - [x] Create notification queue system (Inngest integration)
 - [x] Install @inngest/sdk
@@ -224,6 +242,7 @@
 - [x] Add unsubscribe mechanism
 
 ### Client Management Dashboard
+
 - [x] Create /app/dashboard/clients page
 - [x] Implement client list view with search
 - [x] Add client filtering (by name, email, phone)
@@ -237,6 +256,7 @@
 - [x] Test client search performance
 
 ### Public Booking Widget
+
 - [x] Create /app/book/[salonSlug] public route
 - [x] Design mobile-first booking UI
 - [x] Create service selection step
@@ -253,6 +273,7 @@
 - [x] Test booking widget embedding (iframe support)
 
 ### Mobile Optimization
+
 - [x] Test all forms on mobile devices (iOS/Android)
 - [x] Optimize touch targets (min 44x44px)
 - [x] Test payment forms on mobile
@@ -265,21 +286,23 @@
 - [x] Add fallback to simple card form if Stripe Elements fails
 
 ### Membership System
-- [ ] Create Membership model (id, clientId, salonId, tier, status, startDate, endDate, stripeSubscriptionId)
-- [ ] Create MembershipTier model (id, salonId, name, price, benefits JSON)
-- [ ] Run migration: `prisma migrate dev --name add_memberships`
-- [ ] Create membership signup flow
-- [ ] Implement Stripe subscription creation
-- [ ] Handle recurring billing webhooks (subscription events)
-- [ ] Create membership cancellation flow
-- [ ] Add membership status to client profile
-- [ ] Show membership benefits on booking page
+
+- [x] Create Membership model (id, clientId, salonId, tier, status, startDate, endDate, stripeSubscriptionId)
+- [x] Create MembershipTier model (id, salonId, name, price, benefits JSON)
+- [x] Run migration: `prisma migrate dev --name add_memberships`
+- [x] Create membership signup flow
+- [x] Implement Stripe subscription creation
+- [x] Handle recurring billing webhooks (subscription events)
+- [x] Create membership cancellation flow
+- [x] Add membership status to client profile
+- [x] Show membership benefits on booking page
 - [ ] Test mobile membership signup (iOS/Android)
-- [ ] Implement progress saving for interrupted signups
-- [ ] Add retry logic (max 2 attempts)
-- [ ] Test subscription lifecycle (create, renew, cancel)
+- [x] Implement progress saving for interrupted signups
+- [x] Add retry logic (max 2 attempts)
+- [x] Test subscription lifecycle (create, renew, cancel)
 
 ### Client Portal
+
 - [ ] Create /app/portal route (client authentication)
 - [ ] Implement client login (email/OTP or password)
 - [ ] Create client dashboard view
@@ -296,6 +319,7 @@
 ## Phase 4: Migration & Polish (Weeks 7-8)
 
 ### Data Import System
+
 - [ ] Create /app/dashboard/import page (owner-only)
 - [ ] Design CSV/Excel upload UI
 - [ ] Create file parser (support CSV, XLSX)
@@ -322,6 +346,7 @@
 - [ ] Verify 100% data integrity
 
 ### Service Management
+
 - [ ] Create /app/dashboard/services page
 - [ ] Implement service list view
 - [ ] Create "Add Service" form
@@ -333,6 +358,7 @@
 - [ ] Test service CRUD operations
 
 ### Staff Management
+
 - [ ] Create /app/dashboard/staff page (owner-only)
 - [ ] Implement staff list view
 - [ ] Create "Add Staff" form
@@ -343,6 +369,7 @@
 - [ ] Test staff permissions
 
 ### Blocked Times & Availability
+
 - [ ] Create BlockedTime model (id, staffId, startTime, endTime, reason, recurring)
 - [ ] Run migration: `prisma migrate dev --name add_blocked_times`
 - [ ] Create blocked time management UI
@@ -351,6 +378,7 @@
 - [ ] Test availability calculation
 
 ### Database Performance Tuning
+
 - [ ] Analyze query performance with Prisma query logs
 - [ ] Add missing indexes (identified from slow queries)
 - [ ] Optimize appointment queries with includes
@@ -363,6 +391,7 @@
 - [ ] Review and optimize N+1 queries
 
 ### Redis Caching Setup (Upstash)
+
 - [ ] Create Upstash account
 - [ ] Provision Redis database
 - [ ] Install @upstash/redis package
@@ -373,6 +402,7 @@
 - [ ] Test cache performance improvement
 
 ### Error Handling & Monitoring
+
 - [ ] Set up Sentry account (Team plan - $26/month)
 - [ ] Install @sentry/nextjs
 - [ ] Configure Sentry in next.config.js
@@ -385,6 +415,7 @@
 - [ ] Configure error rate threshold alerts
 
 ### Email Template Improvements
+
 - [x] Create branded email templates (HTML + plain text)
 - [ ] Add company logo and styling
 - [x] Create appointment confirmation template
@@ -396,6 +427,7 @@
 - [ ] Add unsubscribe links
 
 ### UI/UX Polish
+
 - [ ] Implement consistent loading states (skeletons)
 - [ ] Add toast notifications for user actions
 - [ ] Improve form validation messages
@@ -408,6 +440,7 @@
 - [ ] Test all pages on multiple browsers
 
 ### Documentation
+
 - [ ] Write user guide for salon owners
 - [ ] Create staff training documentation
 - [ ] Write data migration guide
@@ -422,6 +455,7 @@
 ## Testing & Quality Assurance
 
 ### Unit Testing
+
 - [ ] Set up Jest and React Testing Library
 - [ ] Write tests for payment logic (CRITICAL)
 - [ ] Write tests for gift certificate validation
@@ -431,6 +465,7 @@
 - [ ] Achieve >80% coverage for critical paths
 
 ### Integration Testing
+
 - [ ] Test complete booking flow (public → payment → confirmation)
 - [ ] Test payment processing with Stripe test cards
 - [ ] Test gift certificate redemption flow
@@ -440,6 +475,7 @@
 - [ ] Test email/SMS delivery
 
 ### End-to-End Testing
+
 - [ ] Set up Playwright or Cypress
 - [ ] Test critical user journeys
   - [ ] Salon owner signup and setup
@@ -453,6 +489,7 @@
 - [ ] Test mobile devices (iOS, Android)
 
 ### Payment Testing - CRITICAL
+
 - [ ] Test gift certificate shows BEFORE credit card option
 - [ ] Test payment with insufficient gift certificate balance
 - [ ] Test payment failure rollback
@@ -463,6 +500,7 @@
 - [ ] Verify ZERO payment errors in testing (Launch requirement ✅)
 
 ### Mobile Testing
+
 - [ ] Test booking widget on iPhone (Safari)
 - [ ] Test booking widget on Android (Chrome)
 - [ ] Test payment form on mobile (iOS)
@@ -473,6 +511,7 @@
 - [ ] Test slow network conditions (3G)
 
 ### Performance Testing
+
 - [ ] Test database response time under load
 - [ ] Verify p95 < 100ms for key queries (Launch requirement ✅)
 - [ ] Test concurrent appointment bookings
@@ -482,6 +521,7 @@
 - [ ] Monitor Core Web Vitals
 
 ### Security Testing
+
 - [ ] Test authentication bypass attempts
 - [ ] Test SQL injection vulnerabilities
 - [ ] Test XSS vulnerabilities
@@ -498,6 +538,7 @@
 ## Pre-Launch Checklist
 
 ### Infrastructure
+
 - [ ] Production database provisioned (Neon Pro - $19/month)
 - [ ] Database backups configured (point-in-time recovery)
 - [ ] Vercel production deployment configured
@@ -510,6 +551,7 @@
 - [ ] Upstash Redis production database active
 
 ### Security & Compliance
+
 - [ ] All API endpoints authenticated
 - [ ] Rate limiting implemented
 - [ ] CORS configured correctly
@@ -521,6 +563,7 @@
 - [ ] GDPR compliance (if applicable)
 
 ### Performance
+
 - [ ] Database indexes optimized
 - [ ] Query performance verified (<100ms p95) ✅
 - [ ] Caching strategy implemented
@@ -530,6 +573,7 @@
 - [ ] Uptime monitoring configured (99.9% SLA target) ✅
 
 ### Payment System Verification - CRITICAL
+
 - [ ] ✅ Zero payment processing errors in testing
 - [ ] ✅ Gift certificates never charge wrong source
 - [ ] Payment audit logs working correctly
@@ -538,6 +582,7 @@
 - [ ] Stripe webhook failover tested
 
 ### Data Import Verification
+
 - [ ] ✅ Data import from CSV with rollback
 - [ ] Sample Fresha data imports successfully
 - [ ] Data validation catches all errors
@@ -546,6 +591,7 @@
 - [ ] Rollback functionality tested
 
 ### Mobile Verification
+
 - [ ] ✅ Mobile booking works on iOS/Android
 - [ ] ✅ 95% mobile completion rate achieved
 - [ ] Touch targets appropriately sized
@@ -554,6 +600,7 @@
 - [ ] Offline error handling graceful
 
 ### Documentation & Support
+
 - [ ] User documentation complete
 - [ ] Video tutorials recorded
 - [ ] FAQ page live
@@ -566,6 +613,7 @@
 ## Launch Strategy
 
 ### Week 1: Soft Launch (5 Beta Salons)
+
 - [ ] Identify 5 beta salons from personal network
 - [ ] Schedule onboarding calls
 - [ ] Manually migrate data for beta users
@@ -576,6 +624,7 @@
 - [ ] Collect initial feedback
 
 ### Week 2-4: Controlled Growth (25 Salons)
+
 - [ ] Open applications for early access
 - [ ] Onboard 5 new salons per week
 - [ ] Monitor database scaling (Neon autoscaling)
@@ -586,6 +635,7 @@
 - [ ] Monitor payment error rate (<0.1% target)
 
 ### Month 2: Public Launch
+
 - [ ] Prepare ProductHunt launch materials
   - [ ] Screenshots and demo video
   - [ ] Launch post copy
@@ -601,6 +651,7 @@
 ## Success Metrics Tracking
 
 ### Launch Requirements (Must Have) ✅
+
 - [ ] ✅ Zero payment processing errors in testing
 - [ ] ✅ Mobile booking works on iOS/Android
 - [ ] ✅ Gift certificates never charge wrong source
@@ -609,6 +660,7 @@
 - [ ] ✅ 99.9% uptime SLA
 
 ### Week 4 Post-Launch Metrics
+
 - [ ] 10 active salons
 - [ ] < 0.1% payment error rate
 - [ ] 95% mobile completion rate
@@ -616,6 +668,7 @@
 - [ ] < 2 hour support response time
 
 ### Monthly Metrics (Ongoing)
+
 - [ ] Monthly churn rate < 5%
 - [ ] Payment error rate < 0.1%
 - [ ] Database uptime > 99.9%
@@ -627,12 +680,14 @@
 ## Risk Mitigation
 
 ### Database Connection Limits (Low Probability, High Impact)
+
 - [x] Neon connection pooling configured
 - [ ] Connection pool monitoring dashboard
 - [ ] Alert on high connection usage (>80%)
 - [ ] Connection leak detection and testing
 
 ### Payment Processing Bugs (Medium Probability, High Impact)
+
 - [ ] Extensive unit tests for payment logic
 - [ ] Payment audit logs for every transaction
 - [ ] Manual QA for all payment flows
@@ -640,6 +695,7 @@
 - [ ] Automated alerts for failed payments
 
 ### Data Migration Errors (Medium Probability, High Impact)
+
 - [ ] Database transactions with rollback
 - [ ] Data preview before import
 - [ ] Import validation with error reports
@@ -647,6 +703,7 @@
 - [ ] Manual verification for beta salons
 
 ### Database Failover Issues (Low Probability, High Impact)
+
 - [ ] Neon automatic failover enabled
 - [ ] Point-in-time recovery tested
 - [ ] Weekly database backups to S3
@@ -658,6 +715,7 @@
 ## Out of Scope (Not in MVP) ❌
 
 Items explicitly NOT included in initial 8-week build:
+
 - ❌ Marketplace/discovery features
 - ❌ Inventory management
 - ❌ Advanced analytics/reporting

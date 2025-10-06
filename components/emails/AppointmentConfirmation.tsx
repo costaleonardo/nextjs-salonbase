@@ -15,19 +15,19 @@ import {
   Text,
   Hr,
   Link,
-} from '@react-email/components'
+} from "@react-email/components";
 
 interface AppointmentConfirmationEmailProps {
-  clientName: string
-  serviceName: string
-  staffName: string
-  appointmentDate: string
-  appointmentTime: string
-  salonName: string
-  salonAddress?: string
-  salonPhone?: string
-  price: string
-  clientId?: string
+  clientName: string;
+  serviceName: string;
+  staffName: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  salonName: string;
+  salonAddress?: string;
+  salonPhone?: string;
+  price: string;
+  clientId?: string;
 }
 
 export const AppointmentConfirmationEmail = ({
@@ -42,10 +42,10 @@ export const AppointmentConfirmationEmail = ({
   price,
   clientId,
 }: AppointmentConfirmationEmailProps) => {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const unsubscribeUrl = clientId
     ? `${baseUrl}/api/unsubscribe?clientId=${clientId}&type=email`
-    : null
+    : null;
   return (
     <Html>
       <Head />
@@ -108,89 +108,89 @@ export const AppointmentConfirmationEmail = ({
         </Container>
       </Body>
     </Html>
-  )
-}
+  );
+};
 
-export default AppointmentConfirmationEmail
+export default AppointmentConfirmationEmail;
 
 // Styles
 const main = {
-  backgroundColor: '#f6f9fc',
+  backgroundColor: "#f6f9fc",
   fontFamily:
     '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
-}
+};
 
 const container = {
-  backgroundColor: '#ffffff',
-  margin: '0 auto',
-  padding: '20px 0 48px',
-  marginBottom: '64px',
-  maxWidth: '600px',
-}
+  backgroundColor: "#ffffff",
+  margin: "0 auto",
+  padding: "20px 0 48px",
+  marginBottom: "64px",
+  maxWidth: "600px",
+};
 
 const h1 = {
-  color: '#333',
-  fontSize: '24px',
-  fontWeight: 'bold',
-  margin: '40px 0 20px',
-  padding: '0 20px',
-}
+  color: "#333",
+  fontSize: "24px",
+  fontWeight: "bold",
+  margin: "40px 0 20px",
+  padding: "0 20px",
+};
 
 const h2 = {
-  color: '#333',
-  fontSize: '18px',
-  fontWeight: 'bold',
-  margin: '20px 0 10px',
-}
+  color: "#333",
+  fontSize: "18px",
+  fontWeight: "bold",
+  margin: "20px 0 10px",
+};
 
 const text = {
-  color: '#333',
-  fontSize: '16px',
-  lineHeight: '24px',
-  padding: '0 20px',
-}
+  color: "#333",
+  fontSize: "16px",
+  lineHeight: "24px",
+  padding: "0 20px",
+};
 
 const appointmentDetails = {
-  backgroundColor: '#f8f9fa',
-  borderRadius: '8px',
-  margin: '20px 20px',
-  padding: '20px',
-}
+  backgroundColor: "#f8f9fa",
+  borderRadius: "8px",
+  margin: "20px 20px",
+  padding: "20px",
+};
 
 const detailItem = {
-  color: '#333',
-  fontSize: '16px',
-  lineHeight: '24px',
-  margin: '8px 0',
-}
+  color: "#333",
+  fontSize: "16px",
+  lineHeight: "24px",
+  margin: "8px 0",
+};
 
 const salonInfo = {
-  padding: '0 20px',
-}
+  padding: "0 20px",
+};
 
 const hr = {
-  borderColor: '#e6ebf1',
-  margin: '20px 0',
-}
+  borderColor: "#e6ebf1",
+  margin: "20px 0",
+};
 
 const footer = {
-  color: '#8898aa',
-  fontSize: '14px',
-  lineHeight: '20px',
-  padding: '0 20px',
-  marginTop: '32px',
-}
+  color: "#8898aa",
+  fontSize: "14px",
+  lineHeight: "20px",
+  padding: "0 20px",
+  marginTop: "32px",
+};
 
 const unsubscribe = {
-  color: '#8898aa',
-  fontSize: '12px',
-  lineHeight: '16px',
-  padding: '0 20px',
-  marginTop: '16px',
-  textAlign: 'center' as const,
-}
+  color: "#8898aa",
+  fontSize: "12px",
+  lineHeight: "16px",
+  padding: "0 20px",
+  marginTop: "16px",
+  textAlign: "center" as const,
+};
 
 const unsubscribeLink = {
-  color: '#6b7280',
-  textDecoration: 'underline',
-}
+  color: "#6b7280",
+  textDecoration: "underline",
+};

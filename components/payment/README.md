@@ -168,18 +168,14 @@ This is enforced at MULTIPLE levels:
 ## Usage Example
 
 ```tsx
-import { PaymentProcessor } from '@/components/payment'
+import { PaymentProcessor } from "@/components/payment";
 
 function AppointmentCheckout({ appointmentId, amount }) {
   // Fetch available gift certificates for the client
-  const giftCertificates = [
-    { code: 'ABCD-EFGH-IJKL', balance: 100 }
-  ]
+  const giftCertificates = [{ code: "ABCD-EFGH-IJKL", balance: 100 }];
 
   // Fetch saved cards (if any)
-  const savedCards = [
-    { id: 'pm_123', last4: '4242', brand: 'Visa' }
-  ]
+  const savedCards = [{ id: "pm_123", last4: "4242", brand: "Visa" }];
 
   return (
     <PaymentProcessor
@@ -189,10 +185,10 @@ function AppointmentCheckout({ appointmentId, amount }) {
       savedCards={savedCards}
       onPaymentComplete={(result) => {
         if (result.success) {
-          console.log('Payment successful:', result.paymentId)
+          console.log("Payment successful:", result.paymentId);
           // Redirect to confirmation page
         } else {
-          console.error('Payment failed:', result.error)
+          console.error("Payment failed:", result.error);
           // Show error message
         }
       }}
@@ -200,7 +196,7 @@ function AppointmentCheckout({ appointmentId, amount }) {
         // Handle cancellation
       }}
     />
-  )
+  );
 }
 ```
 
@@ -213,6 +209,7 @@ npx dotenv -e .env.local -- npx tsx scripts/test-payment-processing.ts
 ```
 
 This test verifies:
+
 - ✅ Payment schema is correctly configured
 - ✅ Payment audit logging works correctly
 - ✅ Payment rollback mechanism works
@@ -240,6 +237,7 @@ The following features are planned but not yet implemented:
 ## Support
 
 For issues or questions about the payment system:
+
 1. Check the audit logs: `getPaymentAuditLog(paymentId)`
 2. Review error logs in Sentry (when configured)
 3. Contact development team with payment ID and timestamp

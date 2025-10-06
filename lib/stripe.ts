@@ -6,8 +6,8 @@
  * - Client-side: Stripe.js for Elements and Payment Intents
  */
 
-import Stripe from "stripe"
-import { loadStripe, Stripe as StripeJS } from "@stripe/stripe-js"
+import Stripe from "stripe";
+import { loadStripe, Stripe as StripeJS } from "@stripe/stripe-js";
 
 // ============================================================================
 // Server-side Stripe client (for API routes, Server Actions, webhooks)
@@ -16,8 +16,8 @@ import { loadStripe, Stripe as StripeJS } from "@stripe/stripe-js"
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error(
     "STRIPE_SECRET_KEY is not set in environment variables. " +
-    "Please add it to .env.local for development or environment settings for production."
-  )
+      "Please add it to .env.local for development or environment settings for production."
+  );
 }
 
 /**
@@ -45,13 +45,13 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     name: "SalonBase MVP",
     version: "1.0.0",
   },
-})
+});
 
 // ============================================================================
 // Client-side Stripe.js loader (for payment forms, Elements)
 // ============================================================================
 
-let stripePromise: Promise<StripeJS | null>
+let stripePromise: Promise<StripeJS | null>;
 
 /**
  * Get the client-side Stripe.js instance
@@ -64,20 +64,20 @@ let stripePromise: Promise<StripeJS | null>
  */
 export function getStripe(): Promise<StripeJS | null> {
   if (!stripePromise) {
-    const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+    const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
     if (!publishableKey) {
       console.error(
         "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not set. " +
-        "Client-side Stripe features will not work."
-      )
-      return Promise.resolve(null)
+          "Client-side Stripe features will not work."
+      );
+      return Promise.resolve(null);
     }
 
-    stripePromise = loadStripe(publishableKey)
+    stripePromise = loadStripe(publishableKey);
   }
 
-  return stripePromise
+  return stripePromise;
 }
 
 // ============================================================================
@@ -88,14 +88,14 @@ export function getStripe(): Promise<StripeJS | null> {
  * Stripe webhook signature secret
  * Used to verify webhook events are from Stripe
  */
-export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || ""
+export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || "";
 
 /**
  * Currency for all transactions (can be made configurable per salon later)
  */
-export const DEFAULT_CURRENCY = "usd"
+export const DEFAULT_CURRENCY = "usd";
 
 /**
  * Minimum charge amount in cents (Stripe requirement: $0.50)
  */
-export const MINIMUM_CHARGE_AMOUNT = 50
+export const MINIMUM_CHARGE_AMOUNT = 50;

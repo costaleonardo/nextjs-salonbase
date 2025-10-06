@@ -1,20 +1,18 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Elements } from '@stripe/react-stripe-js'
-import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js'
-import StripeCardInput from './StripeCardInput'
+import { useState, useEffect } from "react";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe, StripeElementsOptions } from "@stripe/stripe-js";
+import StripeCardInput from "./StripeCardInput";
 
 // Load Stripe outside of component to avoid recreating on every render
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''
-)
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
 
 interface StripePaymentWrapperProps {
-  appointmentId: string
-  amount: number
-  onSuccess: (paymentIntentId: string) => void
-  onError: (error: string) => void
+  appointmentId: string;
+  amount: number;
+  onSuccess: (paymentIntentId: string) => void;
+  onError: (error: string) => void;
 }
 
 /**
@@ -30,59 +28,59 @@ export default function StripePaymentWrapper({
   appointmentId,
   amount,
   onSuccess,
-  onError
+  onError,
 }: StripePaymentWrapperProps) {
-  const [clientSecret, setClientSecret] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Create Payment Intent on mount
     const createPaymentIntent = async () => {
       try {
-        setIsLoading(true)
-        setError(null)
+        setIsLoading(true);
+        setError(null);
 
-        const response = await fetch('/api/payments/create-intent', {
-          method: 'POST',
+        const response = await fetch("/api/payments/create-intent", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             appointmentId,
             amount,
           }),
-        })
+        });
 
-        const data = await response.json()
+        const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to create payment intent')
+          throw new Error(data.error || "Failed to create payment intent");
         }
 
         if (!data.clientSecret) {
-          throw new Error('No client secret returned from server')
+          throw new Error("No client secret returned from server");
         }
 
-        setClientSecret(data.clientSecret)
+        setClientSecret(data.clientSecret);
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Failed to initialize payment'
-        setError(message)
-        onError(message)
+        const message = err instanceof Error ? err.message : "Failed to initialize payment";
+        setError(message);
+        onError(message);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    createPaymentIntent()
-  }, [appointmentId, amount, onError])
+    createPaymentIntent();
+  }, [appointmentId, amount, onError]);
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <svg
-            className="animate-spin h-10 w-10 text-blue-600 mx-auto mb-4"
+            className="mx-auto mb-4 h-10 w-10 animate-spin text-blue-600"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -104,46 +102,46 @@ export default function StripePaymentWrapper({
           <p className="text-gray-600">Initializing payment...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+      <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-800">
         <p className="font-medium">Payment initialization failed</p>
-        <p className="text-sm mt-1">{error}</p>
+        <p className="mt-1 text-sm">{error}</p>
       </div>
-    )
+    );
   }
 
   if (!clientSecret) {
     return (
-      <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg">
+      <div className="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-yellow-800">
         <p>Unable to initialize payment. Please try again.</p>
       </div>
-    )
+    );
   }
 
   const elementsOptions: StripeElementsOptions = {
     clientSecret,
     appearance: {
-      theme: 'stripe',
+      theme: "stripe",
       variables: {
-        colorPrimary: '#2563eb', // blue-600
-        colorBackground: '#ffffff',
-        colorText: '#1f2937', // gray-800
-        colorDanger: '#dc2626', // red-600
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        spacingUnit: '4px',
-        borderRadius: '8px',
+        colorPrimary: "#2563eb", // blue-600
+        colorBackground: "#ffffff",
+        colorText: "#1f2937", // gray-800
+        colorDanger: "#dc2626", // red-600
+        fontFamily: "system-ui, -apple-system, sans-serif",
+        spacingUnit: "4px",
+        borderRadius: "8px",
         // Mobile optimizations
-        fontSizeBase: '16px', // Prevents zoom on iOS
-        fontSizeSm: '14px',
+        fontSizeBase: "16px", // Prevents zoom on iOS
+        fontSizeSm: "14px",
       },
     },
     // Loader settings
-    loader: 'auto',
-  }
+    loader: "auto",
+  };
 
   return (
     <Elements stripe={stripePromise} options={elementsOptions}>
@@ -154,5 +152,5 @@ export default function StripePaymentWrapper({
         appointmentId={appointmentId}
       />
     </Elements>
-  )
+  );
 }

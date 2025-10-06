@@ -5,52 +5,56 @@ This directory contains React Email components for transactional emails.
 ## Available Templates
 
 ### AppointmentConfirmation.tsx
+
 Sent immediately after an appointment is booked.
 
 **Usage:**
+
 ```typescript
-import { sendEmail } from '@/lib/email'
-import AppointmentConfirmationEmail from '@/components/emails/AppointmentConfirmation'
+import { sendEmail } from "@/lib/email";
+import AppointmentConfirmationEmail from "@/components/emails/AppointmentConfirmation";
 
 await sendEmail({
   to: client.email,
-  subject: 'Your appointment is confirmed',
+  subject: "Your appointment is confirmed",
   react: AppointmentConfirmationEmail({
-    clientName: 'John Doe',
-    serviceName: 'Haircut',
-    staffName: 'Jane Smith',
-    appointmentDate: 'Monday, January 15, 2026',
-    appointmentTime: '2:00 PM',
-    salonName: 'My Salon',
-    salonAddress: '123 Main St, Anytown, USA',
-    salonPhone: '(555) 123-4567',
-    price: '50.00',
+    clientName: "John Doe",
+    serviceName: "Haircut",
+    staffName: "Jane Smith",
+    appointmentDate: "Monday, January 15, 2026",
+    appointmentTime: "2:00 PM",
+    salonName: "My Salon",
+    salonAddress: "123 Main St, Anytown, USA",
+    salonPhone: "(555) 123-4567",
+    price: "50.00",
   }),
-})
+});
 ```
 
 ### AppointmentReminder.tsx
+
 Sent 24 hours before an appointment.
 
 **Usage:**
+
 ```typescript
-import { sendEmail } from '@/lib/email'
-import AppointmentReminderEmail from '@/components/emails/AppointmentReminder'
+import { sendEmail } from "@/lib/email";
+import AppointmentReminderEmail from "@/components/emails/AppointmentReminder";
 
 await sendEmail({
   to: client.email,
-  subject: 'Reminder: Your appointment is tomorrow',
+  subject: "Reminder: Your appointment is tomorrow",
   react: AppointmentReminderEmail({
-    clientName: 'John Doe',
-    serviceName: 'Haircut',
-    staffName: 'Jane Smith',
-    appointmentDate: 'Tomorrow, January 16, 2026',
-    appointmentTime: '2:00 PM',
-    salonName: 'My Salon',
-    salonAddress: '123 Main St, Anytown, USA',
-    salonPhone: '(555) 123-4567',
+    clientName: "John Doe",
+    serviceName: "Haircut",
+    staffName: "Jane Smith",
+    appointmentDate: "Tomorrow, January 16, 2026",
+    appointmentTime: "2:00 PM",
+    salonName: "My Salon",
+    salonAddress: "123 Main St, Anytown, USA",
+    salonPhone: "(555) 123-4567",
   }),
-})
+});
 ```
 
 ## Creating New Templates
@@ -61,6 +65,7 @@ await sendEmail({
 4. Follow the naming convention: `{Purpose}Email.tsx`
 
 **Example:**
+
 ```typescript
 import {
   Body,
@@ -97,6 +102,7 @@ export default MyEmail
 ## Testing Templates
 
 Run the email test script:
+
 ```bash
 npx tsx scripts/test-email-sms.ts
 ```
@@ -104,6 +110,7 @@ npx tsx scripts/test-email-sms.ts
 ## Environment Variables
 
 Required for email functionality:
+
 ```
 EMAIL_API_KEY=re_...           # Resend API key
 EMAIL_FROM=noreply@example.com # Optional, defaults to noreply@salonbase.app

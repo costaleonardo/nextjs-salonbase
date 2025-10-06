@@ -1,17 +1,17 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { PaymentSourceSelector, PaymentSourceData } from './PaymentSourceSelector'
-import { PaymentConfirmationModal } from './PaymentConfirmationModal'
-import { processPayment } from '@/app/actions/payments'
+import { useState } from "react";
+import { PaymentSourceSelector, PaymentSourceData } from "./PaymentSourceSelector";
+import { PaymentConfirmationModal } from "./PaymentConfirmationModal";
+import { processPayment } from "@/app/actions/payments";
 
 interface PaymentProcessorProps {
-  appointmentId: string
-  amount: number
-  availableGiftCertificates?: Array<{ code: string; balance: number }>
-  savedCards?: Array<{ id: string; last4: string; brand: string }>
-  onPaymentComplete?: (result: { success: boolean; paymentId?: string; error?: string }) => void
-  onCancel?: () => void
+  appointmentId: string;
+  amount: number;
+  availableGiftCertificates?: Array<{ code: string; balance: number }>;
+  savedCards?: Array<{ id: string; last4: string; brand: string }>;
+  onPaymentComplete?: (result: { success: boolean; paymentId?: string; error?: string }) => void;
+  onCancel?: () => void;
 }
 
 /**
@@ -29,40 +29,44 @@ export function PaymentProcessor({
   availableGiftCertificates = [],
   savedCards = [],
   onPaymentComplete,
-  onCancel
+  onCancel,
 }: PaymentProcessorProps) {
-  const [selectedPaymentSource, setSelectedPaymentSource] = useState<PaymentSourceData | null>(null)
-  const [showConfirmation, setShowConfirmation] = useState(false)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'failed'>('idle')
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [retryAttempt, setRetryAttempt] = useState(0)
-  const [canRetry, setCanRetry] = useState(false)
+  const [selectedPaymentSource, setSelectedPaymentSource] = useState<PaymentSourceData | null>(
+    null
+  );
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<"idle" | "processing" | "success" | "failed">(
+    "idle"
+  );
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [retryAttempt, setRetryAttempt] = useState(0);
+  const [canRetry, setCanRetry] = useState(false);
 
   const handlePaymentSourceChange = (source: PaymentSourceData | null) => {
-    setSelectedPaymentSource(source)
-    setErrorMessage(null)
-  }
+    setSelectedPaymentSource(source);
+    setErrorMessage(null);
+  };
 
   const handleProceedToPayment = () => {
     if (!selectedPaymentSource) {
-      setErrorMessage('Please select a payment method')
-      return
+      setErrorMessage("Please select a payment method");
+      return;
     }
 
     // Show confirmation modal
-    setShowConfirmation(true)
-  }
+    setShowConfirmation(true);
+  };
 
   const handleConfirmPayment = async () => {
     if (!selectedPaymentSource) {
-      setErrorMessage('Please select a payment method')
-      return
+      setErrorMessage("Please select a payment method");
+      return;
     }
 
-    setIsProcessing(true)
-    setPaymentStatus('processing')
-    setErrorMessage(null)
+    setIsProcessing(true);
+    setPaymentStatus("processing");
+    setErrorMessage(null);
 
     try {
       const result = await processPayment({
@@ -74,79 +78,79 @@ export function PaymentProcessor({
           giftCertificateBalance: selectedPaymentSource.giftCertificateBalance,
           // stripePaymentMethodId would be set for credit card payments
         },
-        retryAttempt
-      })
+        retryAttempt,
+      });
 
       if (result.success) {
-        setPaymentStatus('success')
-        setShowConfirmation(false)
+        setPaymentStatus("success");
+        setShowConfirmation(false);
 
         // Call onPaymentComplete callback
         if (onPaymentComplete) {
           onPaymentComplete({
             success: true,
-            paymentId: result.data?.paymentId
-          })
+            paymentId: result.data?.paymentId,
+          });
         }
       } else {
-        setPaymentStatus('failed')
-        setErrorMessage(result.error || 'Payment failed')
-        setShowConfirmation(false)
+        setPaymentStatus("failed");
+        setErrorMessage(result.error || "Payment failed");
+        setShowConfirmation(false);
 
         // Check if retry is available
         if (result.canRetry) {
-          setCanRetry(true)
-          setRetryAttempt(result.retryAttempt || 0)
+          setCanRetry(true);
+          setRetryAttempt(result.retryAttempt || 0);
         } else {
-          setCanRetry(false)
+          setCanRetry(false);
         }
 
         if (onPaymentComplete) {
           onPaymentComplete({
             success: false,
-            error: result.error
-          })
+            error: result.error,
+          });
         }
       }
     } catch (error) {
-      setPaymentStatus('failed')
-      setErrorMessage(error instanceof Error ? error.message : 'An unexpected error occurred')
-      setShowConfirmation(false)
+      setPaymentStatus("failed");
+      setErrorMessage(error instanceof Error ? error.message : "An unexpected error occurred");
+      setShowConfirmation(false);
 
       if (onPaymentComplete) {
         onPaymentComplete({
           success: false,
-          error: error instanceof Error ? error.message : 'An unexpected error occurred'
-        })
+          error: error instanceof Error ? error.message : "An unexpected error occurred",
+        });
       }
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   const handleRetry = () => {
-    setPaymentStatus('idle')
-    setErrorMessage(null)
-    setCanRetry(false)
-  }
+    setPaymentStatus("idle");
+    setErrorMessage(null);
+    setCanRetry(false);
+  };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount)
-  }
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(amount);
+  };
 
   return (
     <div className="space-y-6">
       {/* Payment Status Banner */}
-      {paymentStatus === 'success' && (
-        <div className="bg-green-50 border-2 border-green-500 rounded-lg p-4">
+      {paymentStatus === "success" && (
+        <div className="rounded-lg border-2 border-green-500 bg-green-50 p-4">
           <div className="flex items-start">
-            <span className="text-2xl mr-3">✓</span>
+            <span className="mr-3 text-2xl">✓</span>
             <div>
               <div className="font-semibold text-green-900">Payment Successful</div>
-              <div className="text-sm text-green-800 mt-1">
+              <div className="mt-1 text-sm text-green-800">
                 Your payment of {formatCurrency(amount)} has been processed successfully.
               </div>
             </div>
@@ -154,17 +158,17 @@ export function PaymentProcessor({
         </div>
       )}
 
-      {paymentStatus === 'failed' && errorMessage && (
-        <div className="bg-red-50 border-2 border-red-500 rounded-lg p-4">
+      {paymentStatus === "failed" && errorMessage && (
+        <div className="rounded-lg border-2 border-red-500 bg-red-50 p-4">
           <div className="flex items-start">
-            <span className="text-2xl mr-3">✗</span>
+            <span className="mr-3 text-2xl">✗</span>
             <div className="flex-1">
               <div className="font-semibold text-red-900">Payment Failed</div>
-              <div className="text-sm text-red-800 mt-1">{errorMessage}</div>
+              <div className="mt-1 text-sm text-red-800">{errorMessage}</div>
               {canRetry && (
                 <button
                   onClick={handleRetry}
-                  className="mt-3 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                  className="mt-3 rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
                 >
                   Retry Payment
                 </button>
@@ -174,13 +178,13 @@ export function PaymentProcessor({
         </div>
       )}
 
-      {paymentStatus === 'processing' && (
-        <div className="bg-blue-50 border-2 border-blue-500 rounded-lg p-4">
+      {paymentStatus === "processing" && (
+        <div className="rounded-lg border-2 border-blue-500 bg-blue-50 p-4">
           <div className="flex items-start">
-            <div className="animate-spin mr-3 text-2xl">⟳</div>
+            <div className="mr-3 animate-spin text-2xl">⟳</div>
             <div>
               <div className="font-semibold text-blue-900">Processing Payment...</div>
-              <div className="text-sm text-blue-800 mt-1">
+              <div className="mt-1 text-sm text-blue-800">
                 Please wait while we process your payment. Do not refresh or close this page.
               </div>
             </div>
@@ -189,14 +193,14 @@ export function PaymentProcessor({
       )}
 
       {/* Payment Source Selector */}
-      {paymentStatus !== 'success' && (
+      {paymentStatus !== "success" && (
         <>
           <PaymentSourceSelector
             amountDue={amount}
             onSourceChange={handlePaymentSourceChange}
             availableGiftCertificates={availableGiftCertificates}
             savedCards={savedCards}
-            disabled={isProcessing || paymentStatus === 'processing'}
+            disabled={isProcessing || paymentStatus === "processing"}
           />
 
           {/* Action Buttons */}
@@ -204,22 +208,22 @@ export function PaymentProcessor({
             {onCancel && (
               <button
                 onClick={onCancel}
-                disabled={isProcessing || paymentStatus === 'processing'}
-                className="flex-1 px-6 py-3 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isProcessing || paymentStatus === "processing"}
+                className="flex-1 rounded-md border border-gray-300 px-6 py-3 text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Cancel
               </button>
             )}
             <button
               onClick={handleProceedToPayment}
-              disabled={!selectedPaymentSource || isProcessing || paymentStatus === 'processing'}
-              className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-semibold"
+              disabled={!selectedPaymentSource || isProcessing || paymentStatus === "processing"}
+              className="flex-1 rounded-md bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300"
             >
               Continue to Payment
             </button>
           </div>
 
-          {errorMessage && paymentStatus === 'idle' && (
+          {errorMessage && paymentStatus === "idle" && (
             <div className="text-sm text-red-600">{errorMessage}</div>
           )}
         </>
@@ -236,12 +240,12 @@ export function PaymentProcessor({
       />
 
       {/* Security Notice */}
-      {paymentStatus !== 'success' && (
-        <div className="text-xs text-gray-500 text-center pt-4">
+      {paymentStatus !== "success" && (
+        <div className="pt-4 text-center text-xs text-gray-500">
           <div>🔒 Your payment information is secure and encrypted</div>
           <div className="mt-1">All payment decisions are logged for your security</div>
         </div>
       )}
     </div>
-  )
+  );
 }

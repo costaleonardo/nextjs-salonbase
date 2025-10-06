@@ -1,27 +1,23 @@
-import { auth } from "@/lib/auth"
-import { redirect } from "next/navigation"
-import Sidebar from "@/components/dashboard/Sidebar"
-import MobileNav from "@/components/dashboard/MobileNav"
-import UserMenu from "@/components/dashboard/UserMenu"
-import Breadcrumb from "@/components/dashboard/Breadcrumb"
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import Sidebar from "@/components/dashboard/Sidebar";
+import MobileNav from "@/components/dashboard/MobileNav";
+import UserMenu from "@/components/dashboard/UserMenu";
+import Breadcrumb from "@/components/dashboard/Breadcrumb";
 
-export default async function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const session = await auth()
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth();
 
   if (!session?.user) {
-    redirect("/login")
+    redirect("/login");
   }
 
   // Only OWNER and STAFF can access dashboard
   if (session.user.role !== "OWNER" && session.user.role !== "STAFF") {
-    redirect("/portal")
+    redirect("/portal");
   }
 
-  const userRole = session.user.role as "OWNER" | "STAFF"
+  const userRole = session.user.role as "OWNER" | "STAFF";
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
@@ -33,7 +29,7 @@ export default async function DashboardLayout({
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top Header Bar */}
-        <header className="bg-white border-b border-gray-200 lg:border-0">
+        <header className="border-b border-gray-200 bg-white lg:border-0">
           <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
             {/* Mobile Menu Button */}
             <div className="lg:hidden">
@@ -46,14 +42,11 @@ export default async function DashboardLayout({
             </div>
 
             {/* Desktop: Empty div for spacing */}
-            <div className="hidden lg:block flex-1" />
+            <div className="hidden flex-1 lg:block" />
 
             {/* User Menu */}
             <div className="flex items-center">
-              <UserMenu
-                userName={session.user.name || "User"}
-                userRole={userRole}
-              />
+              <UserMenu userName={session.user.name || "User"} userRole={userRole} />
             </div>
           </div>
         </header>
@@ -67,5 +60,5 @@ export default async function DashboardLayout({
         </main>
       </div>
     </div>
-  )
+  );
 }

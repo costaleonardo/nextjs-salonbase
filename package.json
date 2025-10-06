@@ -17,7 +17,8 @@
     "db:seed": "dotenv -e .env.local -- tsx prisma/seed.ts",
     "test:webhooks": "npx tsx scripts/verify-webhook-setup.ts",
     "test:receipts": "npx tsx scripts/test-receipt-generation.ts",
-    "test:email-sms": "npx tsx scripts/test-email-sms.ts"
+    "test:email-sms": "npx tsx scripts/test-email-sms.ts",
+    "test:memberships": "dotenv -e .env.local -- npx tsx scripts/test-memberships.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",

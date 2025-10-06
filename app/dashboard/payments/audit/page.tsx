@@ -1,23 +1,23 @@
-import { auth } from '@/lib/auth'
-import { db } from '@/lib/db'
-import { redirect } from 'next/navigation'
-import AuditLogTable from './AuditLogTable'
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { redirect } from "next/navigation";
+import AuditLogTable from "./AuditLogTable";
 
 export default async function PaymentAuditPage({
-  searchParams
+  searchParams,
 }: {
-  searchParams: Promise<{ paymentId?: string }>
+  searchParams: Promise<{ paymentId?: string }>;
 }) {
-  const params = await searchParams
-  const session = await auth()
+  const params = await searchParams;
+  const session = await auth();
 
   if (!session?.user?.salonId) {
-    redirect('/login')
+    redirect("/login");
   }
 
   // Only OWNER can view audit logs
-  if (session.user.role !== 'OWNER') {
-    redirect('/dashboard')
+  if (session.user.role !== "OWNER") {
+    redirect("/dashboard");
   }
 
   // Fetch recent audit logs (last 100 entries)
@@ -27,16 +27,16 @@ export default async function PaymentAuditPage({
           paymentId: params.paymentId,
           payment: {
             appointment: {
-              salonId: session.user.salonId
-            }
-          }
+              salonId: session.user.salonId,
+            },
+          },
         }
       : {
           payment: {
             appointment: {
-              salonId: session.user.salonId
-            }
-          }
+              salonId: session.user.salonId,
+            },
+          },
         },
     include: {
       payment: {
@@ -45,38 +45,38 @@ export default async function PaymentAuditPage({
             include: {
               client: true,
               service: true,
-              staff: true
-            }
-          }
-        }
-      }
+              staff: true,
+            },
+          },
+        },
+      },
     },
     orderBy: {
-      createdAt: 'desc'
+      createdAt: "desc",
     },
-    take: 100
-  })
+    take: 100,
+  });
 
   // Fetch all payments for filter dropdown
   const payments = await db.payment.findMany({
     where: {
       appointment: {
-        salonId: session.user.salonId
-      }
+        salonId: session.user.salonId,
+      },
     },
     include: {
       appointment: {
         include: {
           client: true,
-          service: true
-        }
-      }
+          service: true,
+        },
+      },
     },
     orderBy: {
-      createdAt: 'desc'
+      createdAt: "desc",
     },
-    take: 50
-  })
+    take: 50,
+  });
 
   return (
     <div className="space-y-6">
@@ -90,14 +90,14 @@ export default async function PaymentAuditPage({
       </div>
 
       <AuditLogTable
-        auditLogs={JSON.parse(JSON.stringify(auditLogs, (_, v) =>
-          typeof v === 'bigint' ? v.toString() : v
-        ))}
-        payments={JSON.parse(JSON.stringify(payments, (_, v) =>
-          typeof v === 'bigint' ? v.toString() : v
-        ))}
+        auditLogs={JSON.parse(
+          JSON.stringify(auditLogs, (_, v) => (typeof v === "bigint" ? v.toString() : v))
+        )}
+        payments={JSON.parse(
+          JSON.stringify(payments, (_, v) => (typeof v === "bigint" ? v.toString() : v))
+        )}
         currentPaymentId={params.paymentId}
       />
     </div>
-  )
+  );
 }

@@ -1,11 +1,11 @@
-'use server'
+"use server";
 
-import { auth } from '@/lib/auth'
-import { db } from '@/lib/db'
-import { stripe, DEFAULT_CURRENCY, MINIMUM_CHARGE_AMOUNT } from '@/lib/stripe'
-import { redeemGiftCertificate } from './gift-certificates'
-import { sendReceipt } from './receipts'
-import { PaymentMethod, PaymentStatus } from '@prisma/client'
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { stripe, DEFAULT_CURRENCY, MINIMUM_CHARGE_AMOUNT } from "@/lib/stripe";
+import { redeemGiftCertificate } from "./gift-certificates";
+import { sendReceipt } from "./receipts";
+import { PaymentMethod, PaymentStatus } from "@prisma/client";
 
 /**
  * CRITICAL PAYMENT PROCESSING MODULE
@@ -28,22 +28,18 @@ import { PaymentMethod, PaymentStatus } from '@prisma/client'
 /**
  * Logs an entry to the payment audit log
  */
-async function logPaymentAudit(
-  paymentId: string,
-  action: string,
-  details: Record<string, any>
-) {
+async function logPaymentAudit(paymentId: string, action: string, details: Record<string, any>) {
   try {
     await db.paymentAuditLog.create({
       data: {
         paymentId,
         action,
-        details
-      }
-    })
+        details,
+      },
+    });
   } catch (error) {
     // Audit logging should never fail the payment
-    console.error('Failed to log payment audit:', error)
+    console.error("Failed to log payment audit:", error);
   }
 }
 
@@ -51,31 +47,31 @@ async function logPaymentAudit(
  * Process a payment with full audit trail and rollback support
  */
 export async function processPayment(data: {
-  appointmentId: string
-  amount: number
+  appointmentId: string;
+  amount: number;
   paymentSource: {
-    type: 'GIFT_CERTIFICATE' | 'CREDIT_CARD' | 'CASH' | 'OTHER'
-    giftCertificateCode?: string
-    giftCertificateBalance?: number
-    stripePaymentMethodId?: string
-  }
-  retryAttempt?: number
+    type: "GIFT_CERTIFICATE" | "CREDIT_CARD" | "CASH" | "OTHER";
+    giftCertificateCode?: string;
+    giftCertificateBalance?: number;
+    stripePaymentMethodId?: string;
+  };
+  retryAttempt?: number;
 }) {
-  const session = await auth()
+  const session = await auth();
   if (!session?.user) {
-    return { success: false, error: 'Unauthorized' }
+    return { success: false, error: "Unauthorized" };
   }
 
   // Validate amount
   if (data.amount <= 0) {
-    return { success: false, error: 'Invalid payment amount' }
+    return { success: false, error: "Invalid payment amount" };
   }
 
-  const retryAttempt = data.retryAttempt || 0
-  const maxRetries = 2
+  const retryAttempt = data.retryAttempt || 0;
+  const maxRetries = 2;
 
   if (retryAttempt >= maxRetries) {
-    return { success: false, error: 'Maximum payment retry attempts exceeded' }
+    return { success: false, error: "Maximum payment retry attempts exceeded" };
   }
 
   try {
@@ -83,21 +79,21 @@ export async function processPayment(data: {
     const appointment = await db.appointment.findFirst({
       where: {
         id: data.appointmentId,
-        salonId: session.user.salonId!
+        salonId: session.user.salonId!,
       },
       include: {
         service: true,
         client: true,
-        payment: true
-      }
-    })
+        payment: true,
+      },
+    });
 
     if (!appointment) {
-      return { success: false, error: 'Appointment not found' }
+      return { success: false, error: "Appointment not found" };
     }
 
     if (appointment.payment) {
-      return { success: false, error: 'Payment already exists for this appointment' }
+      return { success: false, error: "Payment already exists for this appointment" };
     }
 
     // Create initial payment record with PENDING status
@@ -110,63 +106,63 @@ export async function processPayment(data: {
         metadata: {
           processedBy: session.user.id,
           processedAt: new Date().toISOString(),
-          retryAttempt
-        }
-      }
-    })
+          retryAttempt,
+        },
+      },
+    });
 
     // Log payment source selection
-    await logPaymentAudit(payment.id, 'source_selected', {
+    await logPaymentAudit(payment.id, "source_selected", {
       source: data.paymentSource.type,
       amount: data.amount,
       appointmentId: data.appointmentId,
       selectedBy: session.user.email,
       giftCertificateCode: data.paymentSource.giftCertificateCode,
-      timestamp: new Date().toISOString()
-    })
+      timestamp: new Date().toISOString(),
+    });
 
     // Process payment based on source type
     let paymentResult: {
-      success: boolean
-      stripePaymentId?: string
-      amountCharged?: number
-      giftCertificateApplied?: number
-      error?: string
-    }
+      success: boolean;
+      stripePaymentId?: string;
+      amountCharged?: number;
+      giftCertificateApplied?: number;
+      error?: string;
+    };
 
     try {
       switch (data.paymentSource.type) {
-        case 'GIFT_CERTIFICATE':
+        case "GIFT_CERTIFICATE":
           paymentResult = await processGiftCertificatePayment(
             payment.id,
             data.amount,
             data.paymentSource.giftCertificateCode!
-          )
-          break
+          );
+          break;
 
-        case 'CREDIT_CARD':
+        case "CREDIT_CARD":
           paymentResult = await processCreditCardPayment(
             payment.id,
             data.amount,
             data.paymentSource.stripePaymentMethodId
-          )
-          break
+          );
+          break;
 
-        case 'CASH':
-        case 'OTHER':
+        case "CASH":
+        case "OTHER":
           paymentResult = await processManualPayment(
             payment.id,
             data.amount,
             data.paymentSource.type
-          )
-          break
+          );
+          break;
 
         default:
-          throw new Error('Invalid payment source type')
+          throw new Error("Invalid payment source type");
       }
 
       if (!paymentResult.success) {
-        throw new Error(paymentResult.error || 'Payment processing failed')
+        throw new Error(paymentResult.error || "Payment processing failed");
       }
 
       // Update payment status to COMPLETED
@@ -179,65 +175,65 @@ export async function processPayment(data: {
             ...(payment.metadata as object),
             completedAt: new Date().toISOString(),
             amountCharged: paymentResult.amountCharged,
-            giftCertificateApplied: paymentResult.giftCertificateApplied
-          }
-        }
-      })
+            giftCertificateApplied: paymentResult.giftCertificateApplied,
+          },
+        },
+      });
 
       // Log successful payment
-      await logPaymentAudit(payment.id, 'payment_succeeded', {
+      await logPaymentAudit(payment.id, "payment_succeeded", {
         amount: data.amount,
         method: data.paymentSource.type,
         stripePaymentId: paymentResult.stripePaymentId,
-        timestamp: new Date().toISOString()
-      })
+        timestamp: new Date().toISOString(),
+      });
 
       // Send receipt email automatically (non-blocking)
       // Don't wait for email to complete - let payment succeed even if email fails
-      sendReceipt(payment.id).catch(error => {
-        console.error('Failed to send receipt email:', error)
+      sendReceipt(payment.id).catch((error) => {
+        console.error("Failed to send receipt email:", error);
         // Log to audit trail but don't fail the payment
-        logPaymentAudit(payment.id, 'receipt_send_failed', {
-          error: error instanceof Error ? error.message : 'Unknown error',
-          timestamp: new Date().toISOString()
-        })
-      })
+        logPaymentAudit(payment.id, "receipt_send_failed", {
+          error: error instanceof Error ? error.message : "Unknown error",
+          timestamp: new Date().toISOString(),
+        });
+      });
 
       return {
         success: true,
         data: {
           paymentId: payment.id,
-          status: 'COMPLETED',
+          status: "COMPLETED",
           amount: data.amount,
-          method: data.paymentSource.type
-        }
-      }
+          method: data.paymentSource.type,
+        },
+      };
     } catch (processingError) {
       // Payment processing failed - rollback
-      await rollbackPayment(payment.id, processingError)
+      await rollbackPayment(payment.id, processingError);
 
       // If this was not the last retry, suggest retry
       if (retryAttempt < maxRetries - 1) {
         return {
           success: false,
-          error: processingError instanceof Error ? processingError.message : 'Payment failed',
+          error: processingError instanceof Error ? processingError.message : "Payment failed",
           canRetry: true,
-          retryAttempt: retryAttempt + 1
-        }
+          retryAttempt: retryAttempt + 1,
+        };
       }
 
       return {
         success: false,
-        error: processingError instanceof Error ? processingError.message : 'Payment failed',
-        canRetry: false
-      }
+        error: processingError instanceof Error ? processingError.message : "Payment failed",
+        canRetry: false,
+      };
     }
   } catch (error) {
-    console.error('Payment processing error:', error)
+    console.error("Payment processing error:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Payment processing failed'
-    }
+      error: error instanceof Error ? error.message : "Payment processing failed",
+    };
   }
 }
 
@@ -249,38 +245,38 @@ async function processGiftCertificatePayment(
   amount: number,
   giftCertificateCode: string
 ) {
-  await logPaymentAudit(paymentId, 'gift_certificate_payment_attempt', {
+  await logPaymentAudit(paymentId, "gift_certificate_payment_attempt", {
     code: giftCertificateCode,
     amount,
-    timestamp: new Date().toISOString()
-  })
+    timestamp: new Date().toISOString(),
+  });
 
   const result = await redeemGiftCertificate({
     code: giftCertificateCode,
     amountToRedeem: amount,
-    paymentId
-  })
+    paymentId,
+  });
 
   if (!result.success) {
-    await logPaymentAudit(paymentId, 'gift_certificate_payment_failed', {
+    await logPaymentAudit(paymentId, "gift_certificate_payment_failed", {
       code: giftCertificateCode,
       error: result.error,
-      timestamp: new Date().toISOString()
-    })
-    throw new Error(result.error || 'Failed to redeem gift certificate')
+      timestamp: new Date().toISOString(),
+    });
+    throw new Error(result.error || "Failed to redeem gift certificate");
   }
 
-  await logPaymentAudit(paymentId, 'gift_certificate_payment_succeeded', {
+  await logPaymentAudit(paymentId, "gift_certificate_payment_succeeded", {
     code: giftCertificateCode,
     amountApplied: result.data!.amountApplied,
     remainingBalance: result.data!.remainingBalance,
-    timestamp: new Date().toISOString()
-  })
+    timestamp: new Date().toISOString(),
+  });
 
   return {
     success: true,
-    giftCertificateApplied: result.data!.amountApplied
-  }
+    giftCertificateApplied: result.data!.amountApplied,
+  };
 }
 
 /**
@@ -292,17 +288,17 @@ async function processCreditCardPayment(
   paymentMethodId?: string
 ) {
   // Convert to cents for Stripe
-  const amountInCents = Math.round(amount * 100)
+  const amountInCents = Math.round(amount * 100);
 
   if (amountInCents < MINIMUM_CHARGE_AMOUNT) {
-    throw new Error(`Minimum charge amount is $${MINIMUM_CHARGE_AMOUNT / 100}`)
+    throw new Error(`Minimum charge amount is $${MINIMUM_CHARGE_AMOUNT / 100}`);
   }
 
-  await logPaymentAudit(paymentId, 'credit_card_payment_attempt', {
+  await logPaymentAudit(paymentId, "credit_card_payment_attempt", {
     amount,
     amountInCents,
-    timestamp: new Date().toISOString()
-  })
+    timestamp: new Date().toISOString(),
+  });
 
   try {
     // Create Stripe Payment Intent
@@ -311,75 +307,76 @@ async function processCreditCardPayment(
       currency: DEFAULT_CURRENCY,
       payment_method: paymentMethodId,
       confirm: paymentMethodId ? true : false,
-      automatic_payment_methods: paymentMethodId ? undefined : {
-        enabled: true,
-        allow_redirects: 'never'
-      },
+      automatic_payment_methods: paymentMethodId
+        ? undefined
+        : {
+            enabled: true,
+            allow_redirects: "never",
+          },
       metadata: {
         paymentId,
-        source: 'salonbase_mvp'
-      }
-    })
+        source: "salonbase_mvp",
+      },
+    });
 
-    await logPaymentAudit(paymentId, 'stripe_payment_intent_created', {
+    await logPaymentAudit(paymentId, "stripe_payment_intent_created", {
       paymentIntentId: paymentIntent.id,
       status: paymentIntent.status,
       amount: amountInCents,
-      timestamp: new Date().toISOString()
-    })
+      timestamp: new Date().toISOString(),
+    });
 
     // Check if payment requires additional action (3D Secure)
-    if (paymentIntent.status === 'requires_action' || paymentIntent.status === 'requires_confirmation') {
+    if (
+      paymentIntent.status === "requires_action" ||
+      paymentIntent.status === "requires_confirmation"
+    ) {
       return {
         success: false,
-        error: 'Payment requires additional authentication',
+        error: "Payment requires additional authentication",
         requiresAction: true,
-        clientSecret: paymentIntent.client_secret
-      }
+        clientSecret: paymentIntent.client_secret,
+      };
     }
 
-    if (paymentIntent.status !== 'succeeded') {
-      throw new Error(`Payment failed with status: ${paymentIntent.status}`)
+    if (paymentIntent.status !== "succeeded") {
+      throw new Error(`Payment failed with status: ${paymentIntent.status}`);
     }
 
-    await logPaymentAudit(paymentId, 'credit_card_payment_succeeded', {
+    await logPaymentAudit(paymentId, "credit_card_payment_succeeded", {
       paymentIntentId: paymentIntent.id,
       amount,
-      timestamp: new Date().toISOString()
-    })
+      timestamp: new Date().toISOString(),
+    });
 
     return {
       success: true,
       stripePaymentId: paymentIntent.id,
-      amountCharged: amount
-    }
+      amountCharged: amount,
+    };
   } catch (error) {
-    await logPaymentAudit(paymentId, 'credit_card_payment_failed', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    })
-    throw error
+    await logPaymentAudit(paymentId, "credit_card_payment_failed", {
+      error: error instanceof Error ? error.message : "Unknown error",
+      timestamp: new Date().toISOString(),
+    });
+    throw error;
   }
 }
 
 /**
  * Process manual payment (cash, check, etc.)
  */
-async function processManualPayment(
-  paymentId: string,
-  amount: number,
-  method: 'CASH' | 'OTHER'
-) {
-  await logPaymentAudit(paymentId, 'manual_payment_processed', {
+async function processManualPayment(paymentId: string, amount: number, method: "CASH" | "OTHER") {
+  await logPaymentAudit(paymentId, "manual_payment_processed", {
     method,
     amount,
-    timestamp: new Date().toISOString()
-  })
+    timestamp: new Date().toISOString(),
+  });
 
   return {
     success: true,
-    amountCharged: amount
-  }
+    amountCharged: amount,
+  };
 }
 
 /**
@@ -394,24 +391,24 @@ async function rollbackPayment(paymentId: string, error: unknown) {
         status: PaymentStatus.FAILED,
         metadata: {
           failedAt: new Date().toISOString(),
-          errorMessage: error instanceof Error ? error.message : 'Unknown error'
-        }
-      }
-    })
+          errorMessage: error instanceof Error ? error.message : "Unknown error",
+        },
+      },
+    });
 
     // Log the rollback
-    await logPaymentAudit(paymentId, 'payment_rolled_back', {
-      reason: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    })
+    await logPaymentAudit(paymentId, "payment_rolled_back", {
+      reason: error instanceof Error ? error.message : "Unknown error",
+      timestamp: new Date().toISOString(),
+    });
   } catch (rollbackError) {
-    console.error('Failed to rollback payment:', rollbackError)
+    console.error("Failed to rollback payment:", rollbackError);
     // Log the rollback failure
-    await logPaymentAudit(paymentId, 'rollback_failed', {
-      originalError: error instanceof Error ? error.message : 'Unknown error',
-      rollbackError: rollbackError instanceof Error ? rollbackError.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    })
+    await logPaymentAudit(paymentId, "rollback_failed", {
+      originalError: error instanceof Error ? error.message : "Unknown error",
+      rollbackError: rollbackError instanceof Error ? rollbackError.message : "Unknown error",
+      timestamp: new Date().toISOString(),
+    });
   }
 }
 
@@ -420,36 +417,36 @@ async function rollbackPayment(paymentId: string, error: unknown) {
  */
 export async function getPaymentByAppointmentId(appointmentId: string) {
   try {
-    const session = await auth()
+    const session = await auth();
     if (!session?.user?.salonId) {
-      return { success: false, error: 'Unauthorized' }
+      return { success: false, error: "Unauthorized" };
     }
 
     const payment = await db.payment.findFirst({
       where: {
         appointmentId,
         appointment: {
-          salonId: session.user.salonId
-        }
+          salonId: session.user.salonId,
+        },
       },
       include: {
         appointment: {
           include: {
             client: true,
-            service: true
-          }
-        }
-      }
-    })
+            service: true,
+          },
+        },
+      },
+    });
 
     if (!payment) {
-      return { success: false, error: 'Payment not found' }
+      return { success: false, error: "Payment not found" };
     }
 
-    return { success: true, data: payment }
+    return { success: true, data: payment };
   } catch (error) {
-    console.error('Error fetching payment:', error)
-    return { success: false, error: 'Failed to fetch payment' }
+    console.error("Error fetching payment:", error);
+    return { success: false, error: "Failed to fetch payment" };
   }
 }
 
@@ -458,9 +455,9 @@ export async function getPaymentByAppointmentId(appointmentId: string) {
  */
 export async function getPaymentAuditLog(paymentId: string) {
   try {
-    const session = await auth()
+    const session = await auth();
     if (!session?.user?.salonId) {
-      return { success: false, error: 'Unauthorized' }
+      return { success: false, error: "Unauthorized" };
     }
 
     // Verify payment belongs to user's salon
@@ -468,28 +465,28 @@ export async function getPaymentAuditLog(paymentId: string) {
       where: {
         id: paymentId,
         appointment: {
-          salonId: session.user.salonId
-        }
-      }
-    })
+          salonId: session.user.salonId,
+        },
+      },
+    });
 
     if (!payment) {
-      return { success: false, error: 'Payment not found' }
+      return { success: false, error: "Payment not found" };
     }
 
     const auditLogs = await db.paymentAuditLog.findMany({
       where: {
-        paymentId
+        paymentId,
       },
       orderBy: {
-        createdAt: 'asc'
-      }
-    })
+        createdAt: "asc",
+      },
+    });
 
-    return { success: true, data: auditLogs }
+    return { success: true, data: auditLogs };
   } catch (error) {
-    console.error('Error fetching payment audit log:', error)
-    return { success: false, error: 'Failed to fetch audit log' }
+    console.error("Error fetching payment audit log:", error);
+    return { success: false, error: "Failed to fetch audit log" };
   }
 }
 
@@ -498,130 +495,128 @@ export async function getPaymentAuditLog(paymentId: string) {
  * This is called after the client has successfully confirmed payment with Stripe Elements
  */
 export async function confirmStripePayment(data: {
-  appointmentId: string
-  stripePaymentIntentId: string
+  appointmentId: string;
+  stripePaymentIntentId: string;
 }) {
   try {
-    const session = await auth()
+    const session = await auth();
     if (!session?.user?.salonId) {
-      return { success: false, error: 'Unauthorized' }
+      return { success: false, error: "Unauthorized" };
     }
 
     // Verify the Payment Intent with Stripe
-    const paymentIntent = await stripe.paymentIntents.retrieve(
-      data.stripePaymentIntentId
-    )
+    const paymentIntent = await stripe.paymentIntents.retrieve(data.stripePaymentIntentId);
 
-    if (paymentIntent.status !== 'succeeded') {
+    if (paymentIntent.status !== "succeeded") {
       return {
         success: false,
-        error: `Payment not completed. Status: ${paymentIntent.status}`
-      }
+        error: `Payment not completed. Status: ${paymentIntent.status}`,
+      };
     }
 
     // Verify appointment exists and belongs to user's salon
     const appointment = await db.appointment.findFirst({
       where: {
         id: data.appointmentId,
-        salonId: session.user.salonId
+        salonId: session.user.salonId,
       },
       include: {
-        payment: true
-      }
-    })
+        payment: true,
+      },
+    });
 
     if (!appointment) {
-      return { success: false, error: 'Appointment not found' }
+      return { success: false, error: "Appointment not found" };
     }
 
     // Check if payment already exists
     if (appointment.payment) {
       // Update existing payment if it was pending
-      if (appointment.payment.status === 'PENDING') {
+      if (appointment.payment.status === "PENDING") {
         const updatedPayment = await db.payment.update({
           where: { id: appointment.payment.id },
           data: {
-            status: 'COMPLETED',
+            status: "COMPLETED",
             stripePaymentId: data.stripePaymentIntentId,
             metadata: {
               ...(appointment.payment.metadata as object),
               completedAt: new Date().toISOString(),
-              completedVia: 'stripe_elements'
-            }
-          }
-        })
+              completedVia: "stripe_elements",
+            },
+          },
+        });
 
-        await logPaymentAudit(updatedPayment.id, 'payment_confirmed_via_stripe_elements', {
+        await logPaymentAudit(updatedPayment.id, "payment_confirmed_via_stripe_elements", {
           stripePaymentIntentId: data.stripePaymentIntentId,
-          timestamp: new Date().toISOString()
-        })
+          timestamp: new Date().toISOString(),
+        });
 
         // Send receipt email automatically (non-blocking)
-        sendReceipt(updatedPayment.id).catch(error => {
-          console.error('Failed to send receipt email:', error)
-          logPaymentAudit(updatedPayment.id, 'receipt_send_failed', {
-            error: error instanceof Error ? error.message : 'Unknown error',
-            timestamp: new Date().toISOString()
-          })
-        })
+        sendReceipt(updatedPayment.id).catch((error) => {
+          console.error("Failed to send receipt email:", error);
+          logPaymentAudit(updatedPayment.id, "receipt_send_failed", {
+            error: error instanceof Error ? error.message : "Unknown error",
+            timestamp: new Date().toISOString(),
+          });
+        });
 
         return {
           success: true,
           data: {
             paymentId: updatedPayment.id,
-            amount: updatedPayment.amount
-          }
-        }
+            amount: updatedPayment.amount,
+          },
+        };
       }
 
-      return { success: false, error: 'Payment already completed' }
+      return { success: false, error: "Payment already completed" };
     }
 
     // Create new payment record
-    const amount = paymentIntent.amount / 100 // Convert from cents
+    const amount = paymentIntent.amount / 100; // Convert from cents
     const payment = await db.payment.create({
       data: {
         appointmentId: data.appointmentId,
         amount,
-        method: 'CREDIT_CARD',
-        status: 'COMPLETED',
+        method: "CREDIT_CARD",
+        status: "COMPLETED",
         stripePaymentId: data.stripePaymentIntentId,
         metadata: {
           processedBy: session.user.id,
           completedAt: new Date().toISOString(),
-          completedVia: 'stripe_elements'
-        }
-      }
-    })
+          completedVia: "stripe_elements",
+        },
+      },
+    });
 
-    await logPaymentAudit(payment.id, 'payment_created_from_stripe_elements', {
+    await logPaymentAudit(payment.id, "payment_created_from_stripe_elements", {
       stripePaymentIntentId: data.stripePaymentIntentId,
       amount,
-      timestamp: new Date().toISOString()
-    })
+      timestamp: new Date().toISOString(),
+    });
 
     // Send receipt email automatically (non-blocking)
-    sendReceipt(payment.id).catch(error => {
-      console.error('Failed to send receipt email:', error)
-      logPaymentAudit(payment.id, 'receipt_send_failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
-      })
-    })
+    sendReceipt(payment.id).catch((error) => {
+      console.error("Failed to send receipt email:", error);
+      logPaymentAudit(payment.id, "receipt_send_failed", {
+        error: error instanceof Error ? error.message : "Unknown error",
+        timestamp: new Date().toISOString(),
+      });
+    });
 
     return {
       success: true,
       data: {
         paymentId: payment.id,
-        amount
-      }
-    }
+        amount,
+      },
+    };
   } catch (error) {
-    console.error('Error confirming Stripe payment:', error)
+    console.error("Error confirming Stripe payment:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to confirm payment'
-    }
+      error: error instanceof Error ? error.message : "Failed to confirm payment",
+    };
   }
 }
 
@@ -630,53 +625,53 @@ export async function confirmStripePayment(data: {
  */
 export async function refundPayment(paymentId: string, reason?: string) {
   try {
-    const session = await auth()
+    const session = await auth();
     if (!session?.user?.salonId) {
-      return { success: false, error: 'Unauthorized' }
+      return { success: false, error: "Unauthorized" };
     }
 
     // Only OWNER can process refunds
-    if (session.user.role !== 'OWNER') {
-      return { success: false, error: 'Only salon owners can process refunds' }
+    if (session.user.role !== "OWNER") {
+      return { success: false, error: "Only salon owners can process refunds" };
     }
 
     const payment = await db.payment.findFirst({
       where: {
         id: paymentId,
         appointment: {
-          salonId: session.user.salonId
-        }
-      }
-    })
+          salonId: session.user.salonId,
+        },
+      },
+    });
 
     if (!payment) {
-      return { success: false, error: 'Payment not found' }
+      return { success: false, error: "Payment not found" };
     }
 
     if (payment.status !== PaymentStatus.COMPLETED) {
-      return { success: false, error: 'Only completed payments can be refunded' }
+      return { success: false, error: "Only completed payments can be refunded" };
     }
 
     // Log refund initiation
-    await logPaymentAudit(paymentId, 'refund_initiated', {
+    await logPaymentAudit(paymentId, "refund_initiated", {
       initiatedBy: session.user.email,
       reason,
-      timestamp: new Date().toISOString()
-    })
+      timestamp: new Date().toISOString(),
+    });
 
     // Process refund based on payment method
     if (payment.method === PaymentMethod.CREDIT_CARD && payment.stripePaymentId) {
       // Refund via Stripe
       const refund = await stripe.refunds.create({
         payment_intent: payment.stripePaymentId,
-        reason: 'requested_by_customer'
-      })
+        reason: "requested_by_customer",
+      });
 
-      await logPaymentAudit(paymentId, 'stripe_refund_created', {
+      await logPaymentAudit(paymentId, "stripe_refund_created", {
         refundId: refund.id,
         status: refund.status,
-        timestamp: new Date().toISOString()
-      })
+        timestamp: new Date().toISOString(),
+      });
     }
 
     // Update payment status
@@ -688,18 +683,18 @@ export async function refundPayment(paymentId: string, reason?: string) {
           ...(payment.metadata as object),
           refundedAt: new Date().toISOString(),
           refundedBy: session.user.email,
-          refundReason: reason
-        }
-      }
-    })
+          refundReason: reason,
+        },
+      },
+    });
 
-    await logPaymentAudit(paymentId, 'refund_completed', {
-      timestamp: new Date().toISOString()
-    })
+    await logPaymentAudit(paymentId, "refund_completed", {
+      timestamp: new Date().toISOString(),
+    });
 
-    return { success: true }
+    return { success: true };
   } catch (error) {
-    console.error('Error refunding payment:', error)
-    return { success: false, error: 'Failed to process refund' }
+    console.error("Error refunding payment:", error);
+    return { success: false, error: "Failed to process refund" };
   }
 }

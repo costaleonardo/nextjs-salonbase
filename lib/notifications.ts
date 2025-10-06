@@ -49,9 +49,7 @@ export async function scheduleAppointmentReminder(
 
     // Don't schedule if appointment is less than 24 hours away
     if (reminderTime <= new Date()) {
-      console.log(
-        "Appointment is less than 24 hours away, skipping reminder"
-      );
+      console.log("Appointment is less than 24 hours away, skipping reminder");
       return null;
     }
 

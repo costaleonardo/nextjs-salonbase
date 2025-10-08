@@ -1,6 +1,5 @@
 import { db } from "@/lib/db";
 import { inngest } from "@/lib/inngest";
-import { NotificationType } from "@prisma/client";
 
 /**
  * Schedule an appointment confirmation notification
@@ -182,7 +181,7 @@ export async function cancelPendingReminder(appointmentId: string) {
  * Helper function to get notification preferences for a client
  * This will be used when we implement the unsubscribe mechanism
  */
-export async function getNotificationPreferences(clientId: string) {
+export async function getNotificationPreferences(_clientId: string) {
   // TODO: Implement notification preferences in Client model
   // For now, assume all notifications are enabled
   return {

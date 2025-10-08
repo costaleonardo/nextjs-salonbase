@@ -355,7 +355,7 @@ export const sendAppointmentRescheduledNotification = inngest.createFunction(
   { id: "send-appointment-rescheduled", name: "Send Appointment Rescheduled" },
   { event: "appointment/rescheduled.send" },
   async ({ event, step }) => {
-    const { appointmentId, notificationId, oldDateTime } = event.data;
+    const { appointmentId, notificationId } = event.data;
 
     // Fetch appointment with all related data
     const appointment = await step.run("fetch-appointment", async () => {

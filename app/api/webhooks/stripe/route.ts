@@ -467,12 +467,13 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
 
   try {
     // Only process invoices with subscriptions
-    if (!invoice.subscription) {
+    const invoiceData = invoice as any; // Type assertion for subscription property
+    if (!invoiceData.subscription) {
       return;
     }
 
     const subscriptionId =
-      typeof invoice.subscription === "string" ? invoice.subscription : invoice.subscription.id;
+      typeof invoiceData.subscription === "string" ? invoiceData.subscription : invoiceData.subscription.id;
 
     // Find membership by subscription ID
     const membership = await db.membership.findUnique({
@@ -516,12 +517,13 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
 
   try {
     // Only process invoices with subscriptions
-    if (!invoice.subscription) {
+    const invoiceData = invoice as any; // Type assertion for subscription property
+    if (!invoiceData.subscription) {
       return;
     }
 
     const subscriptionId =
-      typeof invoice.subscription === "string" ? invoice.subscription : invoice.subscription.id;
+      typeof invoiceData.subscription === "string" ? invoiceData.subscription : invoiceData.subscription.id;
 
     // Find membership by subscription ID
     const membership = await db.membership.findUnique({

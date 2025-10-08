@@ -33,7 +33,7 @@ async function testEmailService() {
 
   if (confirmationResult.success) {
     console.log("✅ Appointment confirmation email sent successfully");
-    console.log("   Message ID:", confirmationResult.data?.id);
+    console.log("   Message ID:", (confirmationResult.data as any)?.id);
   } else {
     console.log("❌ Failed to send appointment confirmation email");
     console.log("   Error:", confirmationResult.error);
@@ -58,7 +58,7 @@ async function testEmailService() {
 
   if (reminderResult.success) {
     console.log("✅ Appointment reminder email sent successfully");
-    console.log("   Message ID:", reminderResult.data?.id);
+    console.log("   Message ID:", (reminderResult.data as any)?.id);
   } else {
     console.log("❌ Failed to send appointment reminder email");
     console.log("   Error:", reminderResult.error);
@@ -74,7 +74,7 @@ async function testEmailService() {
 
   if (plainTextResult.success) {
     console.log("✅ Plain text email sent successfully");
-    console.log("   Message ID:", plainTextResult.data?.id);
+    console.log("   Message ID:", (plainTextResult.data as any)?.id);
   } else {
     console.log("❌ Failed to send plain text email");
     console.log("   Error:", plainTextResult.error);

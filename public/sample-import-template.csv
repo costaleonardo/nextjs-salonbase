@@ -1,0 +1,5 @@
+firstName,lastName,email,phone,notes
+John,Doe,john.doe@example.com,(555) 123-4567,Regular customer - prefers morning appointments
+Jane,Smith,jane.smith@example.com,5559876543,VIP client - always books with Sarah
+Bob,Johnson,bob@test.com,555-111-2222,New client - referred by Jane
+Alice,Williams,alice@example.com,(555) 444-5555,Prefers text message reminders

@@ -11,6 +11,7 @@ import {
   CreditCardIcon,
   Cog6ToothIcon,
   UserGroupIcon,
+  ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
 
 interface MobileNavProps {
@@ -46,6 +47,12 @@ const navigationItems = [
     name: "Staff",
     href: "/dashboard/staff",
     icon: UserGroupIcon,
+    roles: ["OWNER"],
+  },
+  {
+    name: "Import Data",
+    href: "/dashboard/import",
+    icon: ArrowDownTrayIcon,
     roles: ["OWNER"],
   },
 ];

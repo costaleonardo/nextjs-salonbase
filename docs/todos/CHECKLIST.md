@@ -303,16 +303,16 @@
 
 ### Client Portal
 
-- [ ] Create /app/portal route (client authentication)
-- [ ] Implement client login (email/OTP or password)
-- [ ] Create client dashboard view
-- [ ] Show upcoming appointments
-- [ ] Show past appointments
-- [ ] Display membership status (if applicable)
-- [ ] Show gift certificate balance
-- [ ] Add appointment cancellation (with policy)
-- [ ] Add appointment rescheduling
-- [ ] Test client portal on mobile
+- [x] Create /app/portal route (client authentication)
+- [x] Implement client login (email/OTP or password)
+- [x] Create client dashboard view
+- [x] Show upcoming appointments
+- [x] Show past appointments
+- [x] Display membership status (if applicable)
+- [x] Show gift certificate balance
+- [x] Add appointment cancellation (with policy)
+- [x] Add appointment rescheduling
+- [x] Test client portal on mobile
 
 ---
 

@@ -347,15 +347,15 @@
 
 ### Service Management
 
-- [ ] Create /app/dashboard/services page
-- [ ] Implement service list view
-- [ ] Create "Add Service" form
-- [ ] Create "Edit Service" form
-- [ ] Add service duration and price fields
-- [ ] Implement staff assignment to services
-- [ ] Add service archive/deletion
-- [ ] Create service category organization (optional)
-- [ ] Test service CRUD operations
+- [x] Create /app/dashboard/services page
+- [x] Implement service list view
+- [x] Create "Add Service" form
+- [x] Create "Edit Service" form
+- [x] Add service duration and price fields
+- [x] Implement staff assignment to services
+- [x] Add service archive/deletion
+- [x] Create service category organization (optional)
+- [x] Test service CRUD operations
 
 ### Staff Management
 

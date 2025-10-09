@@ -359,21 +359,21 @@
 
 ### Staff Management
 
-- [ ] Create /app/dashboard/staff page (owner-only)
-- [ ] Implement staff list view
-- [ ] Create "Add Staff" form
-- [ ] Create "Edit Staff" form
-- [ ] Implement role assignment (OWNER, STAFF)
-- [ ] Add staff schedule/blocked times
-- [ ] Create staff deactivation (soft delete)
-- [ ] Test staff permissions
+- [x] Create /app/dashboard/staff page (owner-only)
+- [x] Implement staff list view
+- [x] Create "Add Staff" form
+- [x] Create "Edit Staff" form
+- [x] Implement role assignment (OWNER, STAFF)
+- [x] Add staff schedule/blocked times
+- [x] Create staff deactivation (soft delete)
+- [x] Test staff permissions
 
 ### Blocked Times & Availability
 
-- [ ] Create BlockedTime model (id, staffId, startTime, endTime, reason, recurring)
-- [ ] Run migration: `prisma migrate dev --name add_blocked_times`
-- [ ] Create blocked time management UI
-- [ ] Implement recurring blocked times (lunch breaks)
+- [x] Create BlockedTime model (id, staffId, startTime, endTime, reason, recurring)
+- [x] Run migration: `prisma migrate dev --name add_blocked_times`
+- [x] Create blocked time management UI
+- [x] Implement recurring blocked times (lunch breaks)
 - [ ] Update conflict detection to account for blocked times
 - [ ] Test availability calculation
 

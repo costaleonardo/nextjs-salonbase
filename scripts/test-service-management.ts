@@ -386,7 +386,7 @@ async function testDeleteService(salonId: string) {
     })
 
     if (staff) {
-      const appointment = await db.appointment.create({
+      await db.appointment.create({
         data: {
           salonId,
           clientId: client.id,
@@ -435,7 +435,7 @@ async function testStaffAssignment(salonId: string) {
     })
 
     // Test 1: Service available to all staff (empty array)
-    const service1 = await db.service.create({
+    await db.service.create({
       data: {
         salonId,
         name: 'Service for All',
@@ -463,7 +463,7 @@ async function testStaffAssignment(salonId: string) {
     logTest('Specific Staff Service', 'PASS', `Assigned to ${staff[0].name}`)
 
     // Test 3: Service assigned to multiple staff
-    const service3 = await db.service.create({
+    await db.service.create({
       data: {
         salonId,
         name: 'Service for Multiple Staff',
@@ -555,7 +555,7 @@ async function main() {
   console.log('='.repeat(60))
 
   try {
-    const { salon, owner, staff1, staff2 } = await setupTestData()
+    const { salon, staff1 } = await setupTestData()
 
     await testCreateService(salon.id)
     const testService = await testRetrieveServices(salon.id)
